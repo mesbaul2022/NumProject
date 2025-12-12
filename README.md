@@ -100,7 +100,6 @@ return c
 
 * YouTube Playlist 1 & 2 (numerical methods videos).
 * **Book:** *Numerical Methods* by E. Balagurusamy.
-* Lecturer contact: [deyalamisa49@gmail.com](mailto:deyalamisa49@gmail.com). 
 
 ---
 
