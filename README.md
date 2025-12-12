@@ -1,4 +1,4 @@
-# Precise (decorated) note — **Bisection & False Position Methods**
+# **Bisection & False Position Methods**
 
 **Source:** *Lab-2: Bisection and False Position Methods* (CSE 2208 — Numerical Methods Laboratory). 
 
