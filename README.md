@@ -1,14 +1,10 @@
 # **Bisection & False Position Methods**
 
-**Source:** *Lab-2: Bisection and False Position Methods* (CSE 2208 — Numerical Methods Laboratory). 
 
 ---
 
-## Overview
-
 * **Course / Lab:** CSE 2208 — Numerical Methods Laboratory.
-* **Instructor:** Lamisa Bintee Mizan Deya (Dept. of CSE, KUET).
-* **Topic:** Bracketing root-finding methods — **Bisection** and **False Position (Regula Falsi)**. 
+* **Topic:** **Bisection** and **False Position (Regula Falsi)**. 
 
 ---
 
