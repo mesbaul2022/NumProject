@@ -107,3 +107,131 @@ return c
 * Turn this into a one-page printable note (PDF).
 * Expand the worked example with the actual iteration table (I’ll extract the slide values and format them). Which would you prefer?
 # NumProject
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Lab-3: Newton–Raphson & Secant — **CSE 2208: Numerical Methods Laboratory**
+
+---
+
+## 1) Overview — *Open methods (interpolation / iterative)*
+
+* **Definition:** Open methods start with one or two initial guesses (they do **not** require the root to be bracketed) and iteratively refine those guesses using interpolation formulas until convergence.
+* **Two methods covered:** **Newton–Raphson** and **Secant**. 
+
+---
+
+## 2) Newton–Raphson method — key facts
+
+* **Iteration formula**
+  [
+  x_{n+1}=x_n - \frac{f(x_n)}{f'(x_n)}
+  ]
+* **Convergence:** quadratic (fast) if (f'(x^\star)\neq 0) and initial guess is sufficiently close. Requires computation of derivative (f').
+* **Geometric idea:** approximate (f) by its tangent at (x_n), step to the tangent root (see slide figure). 
+
+---
+
+### Worked example from the slides (Problem 1)
+
+**Problem statement (slide):**
+Find the root *in the vicinity of* (x=0) of
+[
+f(x)=3x-\cos x - 1.
+]
+(Problem & slides: Lab-3). 
+
+* **Derivative**
+  [
+  f'(x)=3+\sin x.
+  ]
+
+* **Newton–Raphson example** (chosen initial guess (x_0=0.5), shown to illustrate the iterations):
+
+|  n |     (x_n)    |    (f(x_n))   |   (f'(x_n))  |   (x_{n+1})  |
+| -: | :----------: | :-----------: | :----------: | :----------: |
+|  1 | 0.5000000000 | -0.3775825619 | 3.4794255386 | 0.6085186499 |
+|  2 | 0.6085186499 |  0.0050602142 | 3.5716526463 | 0.6071018788 |
+|  3 | 0.6071018788 | 8.2373687e-07 | 3.5704896184 | 0.6071016481 |
+|  4 | 0.6071016481 | 2.1760371e-14 | 3.5704894289 | 0.6071016481 |
+
+* **Converged root (NR):** (x^\star \approx \mathbf{0.6071016481031226}).
+
+*(Iterations above are a compact numerical run of the NR formula to show rapid quadratic convergence.)*
+
+---
+
+## 3) Secant method — key facts
+
+* **Iteration formula**
+  [
+  x_{n+1}=x_n - f(x_n),\frac{x_n-x_{n-1}}{f(x_n)-f(x_{n-1})}
+  ]
+  (uses two last iterates; no derivative required).
+* **Convergence:** superlinear (≈1.618 order), typically slower than Newton–Raphson but avoids evaluating (f').
+* **Geometric idea:** replace the tangent by the secant line through two recent points. See slide figure and Problem 2. 
+
+---
+
+### Worked example from the slides (Problem 2)
+
+**Problem statement (slide):** same function
+[
+f(x)=3x-\cos x - 1,
+]
+solved by the **Secant** method. (Slides show the problem & a result table; initial guesses were used in the lecture.) 
+
+* **Secant example** (illustrative initial guesses (x_0=0.0,; x_1=1.0)):
+
+|  n |   (x_{n-1})  |     (x_n)    |  (f(x_{n-1})) |    (f(x_n))    |   (x_{n+1})  |
+| -: | :----------: | :----------: | :-----------: | :------------: | :----------: |
+|  1 | 0.0000000000 | 1.0000000000 | -2.0000000000 |  1.4596976941  | 0.5780851903 |
+|  2 | 1.0000000000 | 0.5780851903 |  1.4596976941 |  -0.1032549064 | 0.6059585719 |
+|  3 | 0.5780851903 | 0.6059585719 | -0.1032549064 |  -0.0040808049 | 0.6071055027 |
+|  4 | 0.6059585719 | 0.6071055027 | -0.0040808049 |  1.3762708e-05 | 0.6071016476 |
+|  5 | 0.6071055027 | 0.6071016476 | 1.3762708e-05 | -1.8100770e-09 | 0.6071016481 |
+
+* **Converged root (Secant):** (x^\star \approx \mathbf{0.6071016481031226}) (same root as NR).
+
+*(This demonstrates Secant converging to the same root; secant requires a couple more iterations here but avoids derivative evaluation.)*
+
+---
+
+## 4) Practical notes — when to use which
+
+* **Newton–Raphson**
+
+  * Pros: very fast (quadratic) near the root.
+  * Cons: need (f'); may diverge if initial guess poor or (f'(x)) small.
+* **Secant**
+
+  * Pros: no derivative required; cheaper per iteration.
+  * Cons: slower than NR (superlinear), needs two initial guesses; may fail if iterates give equal function values.
+
+---
+
+## 5) References (from the provided slides)
+
+* YouTube Playlists (lecture support) — links in the slides. 
+* Book: *Numerical Methods* by E. Balagurusamy. 
+
+---
+
+
+
