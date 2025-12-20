@@ -1,564 +1,954 @@
-Gaussian elimination is commonly described as a step-by-step procedure that solves linear systems by applying row operations to transform the augmented matrix into (upper) row‑echelon form before back‑substitution.[1]
-Below is a complete, ready-to-paste `README.md` structure (with all your requested topics) that you can edit to match your exact file names and languages.
+# Numerical Lab Project (C++)
 
-```markdown
-# Numerical Methods Laboratory
-
-A collection of Numerical Methods lab implementations covering **linear** systems, **non-linear** equations, **interpolation**, **numerical integration/differentiation**, **least squares regression**, and **Runge–Kutta** methods.
+Numerical Methods Laboratory implementations in **C++**: solution of linear equations, non-linear root finding, interpolation, numerical integration & differentiation, least squares regression, and Runge–Kutta (ODE).
 
 ---
 
-## Table of Contents
+## Index
 
-- [Project Overview](#project-overview)
-- [Features](#features)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [How to Run](#how-to-run)
-  - [Input/Output Convention](#inputoutput-convention)
-- [Implemented Methods](#implemented-methods)
-  - [Linear Methods](#linear-methods)
-    - [Gauss Elimination](#gauss-elimination)
-    - [Gauss-Jordan](#gauss-jordan)
-    - [LU Decomposition](#lu-decomposition)
-    - [Matrix Inversion](#matrix-inversion)
-  - [Non-linear Methods](#non-linear-methods)
-    - [Bisection Method](#bisection-method)
-    - [False Position (Regula Falsi)](#false-position-regula-falsi)
-    - [Secant Method](#secant-method)
-    - [Newton–Raphson Method](#newtonraphson-method)
-  - [Interpolation](#interpolation)
-    - [Newton Forward Interpolation](#newton-forward-interpolation)
-    - [Newton Backward Interpolation](#newton-backward-interpolation)
-    - [Newton Divided Difference](#newton-divided-difference)
-  - [Numerical Integration](#numerical-integration)
-    - [Simpson’s 1/3 Rule](#simpsons-13-rule)
-    - [Simpson’s 3/8 Rule](#simpsons-38-rule)
-  - [Numerical Differentiation](#numerical-differentiation)
-  - [Least Squares Regression](#least-squares-regression)
-    - [Linear Regression](#linear-regression)
-    - [Polynomial Regression](#polynomial-regression)
-    - [Transcendental Regression](#transcendental-regression)
-  - [Runge–Kutta (ODE)](#rungekutta-ode)
-- [Project Structure](#project-structure)
-- [Adding a New Method](#adding-a-new-method)
-- [Contributing](#contributing)
-- [License](#license)
-- [Acknowledgements](#acknowledgements)
+- [How to run](#how-to-run)
+- [Solution of Linear Equations](#solution-of-linear-equations)
+  - [Gauss Elimination](#gauss-elimination)
+  - [Gauss Jordan](#gauss-jordan)
+  - [LU Decomposition](#lu-decomposition)
+  - [Matrix Inversion](#matrix-inversion)
+- [Solution of Non-linear Equations](#solution-of-non-linear-equations)
+  - [Bisection](#bisection)
+  - [False Position](#false-position)
+  - [Secant](#secant)
+  - [Newton Raphson](#newton-raphson)
+- [Interpolation](#interpolation)
+  - [Newton Forward](#newton-forward)
+  - [Newton Backward](#newton-backward)
+  - [Divided Difference](#divided-difference)
+- [Numerical Integration](#numerical-integration)
+  - [Simpson 1/3](#simpson-13)
+  - [Simpson 3/8](#simpson-38)
+- [Numerical Differentiation](#numerical-differentiation)
+- [Least Squares](#least-squares)
+  - [Linear Regression](#linear-regression)
+  - [Polynomial Regression](#polynomial-regression)
+  - [Transcendental Regression](#transcendental-regression)
+- [Runge Kutta](#runge-kutta)
 
 ---
 
-## Project Overview
+## How to run
 
-This repository is designed for Numerical Methods laboratory work and practice.
-Each method includes a short description, expected inputs/outputs, and code implementation.
-
----
-
-## Features
-
-- Clear separation by topic (Linear / Non-linear / Interpolation / Integration / etc.)
-- Standard tolerance-based stopping criteria for iterative methods
-- Example input format included for quick testing
-- Easy-to-extend structure for adding more methods
-
----
-
-## Getting Started
-
-### Prerequisites
-
-Update this section depending on your language:
-
-- **C/C++**: GCC / G++ (or CodeBlocks)
-- **Python**: Python 3.x
-- **MATLAB/Octave** (optional): If you used MATLAB/Octave scripts
-
-### How to Run
-
-> Replace file names below with your actual file paths.
-
-#### C/C++ (example)
+### Compile
 ```
-# Compile
-g++ path/to/file.cpp -o run
-
-# Run
-./run
+g++ -std=c++17 -O2 -o app filename.cpp
 ```
 
-#### Python (example)
+### Run
 ```
-python path/to/file.py
+./app
 ```
 
-### Input/Output Convention
-
-Use a consistent format across programs (recommended):
-
-- **Inputs** (typical):
-  - Matrix size `n`
-  - Coefficient matrix `A`
-  - RHS vector `b`
-  - Initial guesses / bracket `[a, b]`
-  - Tolerance `eps`
-  - Maximum iteration `maxIter`
-
-- **Outputs** (typical):
-  - Approximated solution (vector or root)
-  - Iteration table (optional but recommended)
-  - Error value per iteration (optional)
+> Tip: Each section below suggests a file path. Create files accordingly (recommended).
 
 ---
 
-## Implemented Methods
-
-## Linear Methods
+## Solution of Linear Equations
 
 ### Gauss Elimination
 
-**Goal:** Solve a system of linear equations \(Ax=b\) using forward elimination + back substitution.
+**Goal:** Solve \(Ax=b\) using forward elimination + back substitution.  
+**File:** `Linear/gauss_elimination.cpp`
 
-**Inputs**
-- `n` (order of the system)
-- `A` (coefficient matrix)
-- `b` (constant vector)
-- (Optional) pivoting on/off
+**Input format**
+- `n`
+- `A` matrix (`n x n`)
+- `b` vector (`n`)
 
-**Outputs**
-- Solution vector `x`
-- (Optional) transformed upper-triangular matrix
+```
+#include <bits/stdc++.h>
+using namespace std;
 
-**Algorithm (high-level)**
-- Build the augmented matrix \([A|b]\)
-- Forward eliminate below the diagonal
-- Back substitute to obtain `x`
+static const double EPS = 1e-12;
 
-**Code**
-- File: `./Linear/GaussElimination/...`
-- Link: _Add your GitHub file link here_
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-**Sample**
-- Input: _Put a small example here_
-- Output: _Expected output here_
+    int n;
+    cin >> n;
+    vector<vector<double>> a(n, vector<double>(n+1));
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++) cin >> a[i][j];
+    }
+    for(int i=0;i<n;i++) cin >> a[i][n];
+
+    // Partial pivoting + forward elimination
+    for(int col=0; col<n; col++){
+        int pivot = col;
+        for(int row=col+1; row<n; row++)
+            if (fabs(a[row][col]) > fabs(a[pivot][col])) pivot = row;
+
+        if (fabs(a[pivot][col]) < EPS) {
+            cout << "No unique solution (singular matrix).\n";
+            return 0;
+        }
+        swap(a[pivot], a[col]);
+
+        for(int row=col+1; row<n; row++){
+            double factor = a[row][col] / a[col][col];
+            for(int k=col; k<=n; k++){
+                a[row][k] -= factor * a[col][k];
+            }
+        }
+    }
+
+    // Back substitution
+    vector<double> x(n);
+    for(int i=n-1; i>=0; i--){
+        double sum = a[i][n];
+        for(int j=i+1; j<n; j++) sum -= a[i][j]*x[j];
+        x[i] = sum / a[i][i];
+    }
+
+    cout.setf(std::ios::fixed); cout<<setprecision(6);
+    for(int i=0;i<n;i++) cout << "x["<<i<<"] = " << x[i] << "\n";
+    return 0;
+}
+```
 
 ---
 
-### Gauss-Jordan
+### Gauss Jordan
 
-**Goal:** Solve \(Ax=b\) by transforming \([A|b]\) to reduced row echelon form (RREF).
+**Goal:** Solve \(Ax=b\) by reducing \([A|b]\) to RREF.  
+**File:** `Linear/gauss_jordan.cpp`
 
-**Inputs**
-- `n`, `A`, `b`
+```
+#include <bits/stdc++.h>
+using namespace std;
 
-**Outputs**
-- Solution vector `x`
-- (Optional) RREF matrix
+static const double EPS = 1e-12;
 
-**Algorithm (high-level)**
-- Make pivot 1
-- Make all other entries in pivot column 0
-- Read solution directly
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-**Code**
-- File: `./Linear/GaussJordan/...`
+    int n;
+    cin >> n;
+    vector<vector<double>> a(n, vector<double>(n+1));
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++) cin >> a[i][j];
+    }
+    for(int i=0;i<n;i++) cin >> a[i][n];
+
+    for(int col=0; col<n; col++){
+        int pivot = col;
+        for(int row=col; row<n; row++)
+            if (fabs(a[row][col]) > fabs(a[pivot][col])) pivot = row;
+
+        if (fabs(a[pivot][col]) < EPS){
+            cout << "No unique solution (singular matrix).\n";
+            return 0;
+        }
+        swap(a[pivot], a[col]);
+
+        double div = a[col][col];
+        for(int k=col; k<=n; k++) a[col][k] /= div;
+
+        for(int row=0; row<n; row++){
+            if(row==col) continue;
+            double factor = a[row][col];
+            for(int k=col; k<=n; k++){
+                a[row][k] -= factor * a[col][k];
+            }
+        }
+    }
+
+    cout.setf(std::ios::fixed); cout<<setprecision(6);
+    for(int i=0;i<n;i++) cout << "x["<<i<<"] = " << a[i][n] << "\n";
+    return 0;
+}
+```
 
 ---
 
 ### LU Decomposition
 
-**Goal:** Factorize \(A = LU\) and solve \(Ax=b\) via forward/back substitution.
+**Goal:** Factorize \(A = LU\) (Doolittle) and solve \(Ax=b\).  
+**File:** `Linear/lu_decomposition.cpp`
 
-**Common Variants**
-- Doolittle (diagonal of `L` is 1)
-- Crout (diagonal of `U` is 1)
+```
+#include <bits/stdc++.h>
+using namespace std;
 
-**Inputs**
-- `n`, `A`, `b`
+static const double EPS = 1e-12;
 
-**Outputs**
-- Matrices `L` and `U`
-- Solution vector `x`
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-**Algorithm (high-level)**
-- Decompose `A` into `L` and `U`
-- Solve `Ly=b` (forward substitution)
-- Solve `Ux=y` (back substitution)
+    int n;
+    cin >> n;
+    vector<vector<double>> A(n, vector<double>(n));
+    vector<double> b(n);
+    for(int i=0;i<n;i++) for(int j=0;j<n;j++) cin >> A[i][j];
+    for(int i=0;i<n;i++) cin >> b[i];
 
-**Code**
-- File: `./Linear/LU/...`
+    vector<vector<double>> L(n, vector<double>(n,0.0)), U(n, vector<double>(n,0.0));
+    for(int i=0;i<n;i++) L[i][i] = 1.0;
+
+    for(int i=0;i<n;i++){
+        for(int j=i;j<n;j++){
+            double sum = 0;
+            for(int k=0;k<i;k++) sum += L[i][k]*U[k][j];
+            U[i][j] = A[i][j] - sum;
+        }
+        if (fabs(U[i][i]) < EPS){
+            cout << "LU failed (zero pivot). Try pivoting-based LU.\n";
+            return 0;
+        }
+        for(int j=i+1;j<n;j++){
+            double sum = 0;
+            for(int k=0;k<i;k++) sum += L[j][k]*U[k][i];
+            L[j][i] = (A[j][i] - sum) / U[i][i];
+        }
+    }
+
+    // Forward substitution: Ly=b
+    vector<double> y(n);
+    for(int i=0;i<n;i++){
+        double sum = b[i];
+        for(int k=0;k<i;k++) sum -= L[i][k]*y[k];
+        y[i] = sum; // since L[i][i]=1
+    }
+
+    // Back substitution: Ux=y
+    vector<double> x(n);
+    for(int i=n-1;i>=0;i--){
+        double sum = y[i];
+        for(int k=i+1;k<n;k++) sum -= U[i][k]*x[k];
+        x[i] = sum / U[i][i];
+    }
+
+    cout.setf(std::ios::fixed); cout<<setprecision(6);
+    for(int i=0;i<n;i++) cout << "x["<<i<<"] = " << x[i] << "\n";
+    return 0;
+}
+```
 
 ---
 
 ### Matrix Inversion
 
-**Goal:** Compute \(A^{-1}\) (if it exists), typically using Gauss-Jordan on \([A|I]\).
+**Goal:** Compute \(A^{-1}\) using Gauss-Jordan on \([A|I]\).  
+**File:** `Linear/matrix_inversion.cpp`
 
-**Inputs**
-- `n`, `A`
+```
+#include <bits/stdc++.h>
+using namespace std;
 
-**Outputs**
-- `A_inv` or message: "Singular matrix"
+static const double EPS = 1e-12;
 
-**Algorithm (high-level)**
-- Form augmented matrix \([A|I]\)
-- Apply Gauss-Jordan
-- Extract inverse from the right block
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-**Code**
-- File: `./Linear/MatrixInverse/...`
+    int n; 
+    cin >> n;
+    vector<vector<double>> aug(n, vector<double>(2*n, 0.0));
 
----
+    // Read A
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++) cin >> aug[i][j];
+    }
+    // Append Identity
+    for(int i=0;i<n;i++) aug[i][n+i] = 1.0;
 
-## Non-linear Methods
+    for(int col=0; col<n; col++){
+        int pivot = col;
+        for(int row=col; row<n; row++)
+            if (fabs(aug[row][col]) > fabs(aug[pivot][col])) pivot = row;
 
-### Bisection Method
+        if (fabs(aug[pivot][col]) < EPS){
+            cout << "Singular matrix. Inverse does not exist.\n";
+            return 0;
+        }
+        swap(aug[pivot], aug[col]);
 
-**Goal:** Find a root of \(f(x)=0\) in an interval \([a,b]\) where \(f(a)\cdot f(b) < 0\).
+        double div = aug[col][col];
+        for(int k=0;k<2*n;k++) aug[col][k] /= div;
 
-**Inputs**
-- Function `f(x)`
-- `a`, `b`
-- `eps`, `maxIter`
+        for(int row=0; row<n; row++){
+            if(row==col) continue;
+            double factor = aug[row][col];
+            for(int k=0;k<2*n;k++){
+                aug[row][k] -= factor * aug[col][k];
+            }
+        }
+    }
 
-**Outputs**
-- Approximated root `x`
-- Iteration count (optional)
-
-**Algorithm (high-level)**
-- Compute midpoint `c=(a+b)/2`
-- Choose subinterval that preserves sign change
-- Stop when error < `eps` or `f(c)==0`
-
-**Code**
-- File: `./NonLinear/Bisection/...`
-
----
-
-### False Position (Regula Falsi)
-
-**Goal:** Find a root in \([a,b]\) using a secant line but keeping the bracket.
-
-**Inputs**
-- `f(x)`, `a`, `b`, `eps`, `maxIter`
-
-**Outputs**
-- Approximated root
-
-**Algorithm (high-level)**
-- Compute intersection point using straight line through \((a,f(a))\) and \((b,f(b))\)
-- Replace `a` or `b` depending on sign
-- Repeat until convergence
-
-**Code**
-- File: `./NonLinear/FalsePosition/...`
+    cout.setf(std::ios::fixed); cout<<setprecision(6);
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            cout << aug[i][n+j] << (j+1==n?'\n':' ');
+        }
+    }
+    return 0;
+}
+```
 
 ---
 
-### Secant Method
+## Solution of Non-linear Equations
 
-**Goal:** Find a root using secant updates (no derivative needed).
+> Edit the `f(x)` (and `df(x)` if needed) inside each file.
 
-**Inputs**
-- `f(x)`
-- Two initial guesses `x0`, `x1`
-- `eps`, `maxIter`
+### Bisection
 
-**Outputs**
-- Approximated root
+**File:** `NonLinear/bisection.cpp`
 
-**Algorithm (high-level)**
-- Iteratively compute the next point from the secant line through the last two points
+```
+#include <bits/stdc++.h>
+using namespace std;
 
-**Code**
-- File: `./NonLinear/Secant/...`
+double f(double x){
+    // Example: x^3 - x - 2 = 0
+    return x*x*x - x - 2;
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    double a,b,eps; int maxIter;
+    cin >> a >> b >> eps >> maxIter;
+
+    if(f(a)*f(b) > 0){
+        cout << "Invalid bracket: f(a) and f(b) must have opposite signs.\n";
+        return 0;
+    }
+
+    double c=a;
+    for(int i=1;i<=maxIter;i++){
+        c = (a+b)/2.0;
+        if (fabs(f(c)) < eps || fabs(b-a) < eps) break;
+        if (f(a)*f(c) < 0) b=c;
+        else a=c;
+    }
+    cout.setf(std::ios::fixed); cout<<setprecision(10);
+    cout << "Root ~ " << c << "\n";
+    return 0;
+}
+```
 
 ---
 
-### NewtonRaphson Method
+### False Position
 
-**Goal:** Find a root using derivative-based iteration.
+**File:** `NonLinear/false_position.cpp`
 
-**Inputs**
-- `f(x)`, `f'(x)`
-- Initial guess `x0`
-- `eps`, `maxIter`
+```
+#include <bits/stdc++.h>
+using namespace std;
 
-**Outputs**
-- Approximated root
+double f(double x){
+    return x*x*x - x - 2;
+}
 
-**Algorithm (high-level)**
-- Update: `x_{k+1} = x_k - f(x_k)/f'(x_k)`
-- Stop when error < `eps` or iteration limit reached
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-**Code**
-- File: `./NonLinear/NewtonRaphson/...`
+    double a,b,eps; int maxIter;
+    cin >> a >> b >> eps >> maxIter;
+
+    if(f(a)*f(b) > 0){
+        cout << "Invalid bracket.\n";
+        return 0;
+    }
+
+    double c=a;
+    for(int i=1;i<=maxIter;i++){
+        double fa=f(a), fb=f(b);
+        c = (a*fb - b*fa) / (fb - fa); // regula falsi
+        double fc = f(c);
+        if (fabs(fc) < eps) break;
+        if (fa*fc < 0) b=c;
+        else a=c;
+        if (fabs(b-a) < eps) break;
+    }
+
+    cout.setf(std::ios::fixed); cout<<setprecision(10);
+    cout << "Root ~ " << c << "\n";
+    return 0;
+}
+```
+
+---
+
+### Secant
+
+**File:** `NonLinear/secant.cpp`
+
+```
+#include <bits/stdc++.h>
+using namespace std;
+
+double f(double x){
+    return x*x*x - x - 2;
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    double x0,x1,eps; int maxIter;
+    cin >> x0 >> x1 >> eps >> maxIter;
+
+    double x2=x1;
+    for(int i=1;i<=maxIter;i++){
+        double f0=f(x0), f1=f(x1);
+        if (fabs(f1-f0) < 1e-15){
+            cout << "Division by near-zero.\n";
+            return 0;
+        }
+        x2 = x1 - f1*(x1-x0)/(f1-f0);
+        if (fabs(x2-x1) < eps || fabs(f(x2)) < eps) break;
+        x0=x1; x1=x2;
+    }
+
+    cout.setf(std::ios::fixed); cout<<setprecision(10);
+    cout << "Root ~ " << x2 << "\n";
+    return 0;
+}
+```
+
+---
+
+### Newton Raphson
+
+**File:** `NonLinear/newton_raphson.cpp`
+
+```
+#include <bits/stdc++.h>
+using namespace std;
+
+double f(double x){
+    return x*x*x - x - 2;
+}
+double df(double x){
+    return 3*x*x - 1;
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    double x,eps; int maxIter;
+    cin >> x >> eps >> maxIter;
+
+    for(int i=1;i<=maxIter;i++){
+        double d = df(x);
+        if (fabs(d) < 1e-15){
+            cout << "Derivative too small.\n";
+            return 0;
+        }
+        double x1 = x - f(x)/d;
+        if (fabs(x1-x) < eps || fabs(f(x1)) < eps){
+            x = x1; break;
+        }
+        x = x1;
+    }
+
+    cout.setf(std::ios::fixed); cout<<setprecision(10);
+    cout << "Root ~ " << x << "\n";
+    return 0;
+}
+```
 
 ---
 
 ## Interpolation
 
-### Newton Forward Interpolation
+### Newton Forward
 
-**Use when:** points are equally spaced and `x` is near the beginning of the table.
+**File:** `Interpolation/newton_forward.cpp`  
+**Note:** Requires equally spaced `x`.
 
-**Inputs**
-- Data points \((x_i, y_i)\) (equal spacing)
-- Target `x`
+```
+#include <bits/stdc++.h>
+using namespace std;
 
-**Outputs**
-- Approximated `y(x)`
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-**Code**
-- File: `./Interpolation/NewtonForward/...`
+    int n; cin >> n;
+    vector<double> x(n), y(n);
+    for(int i=0;i<n;i++) cin >> x[i] >> y[i];
+    double xp; cin >> xp;
+
+    vector<vector<double>> diff(n, vector<double>(n,0.0));
+    for(int i=0;i<n;i++) diff[i]=y[i];
+    for(int j=1;j<n;j++)
+        for(int i=0;i<n-j;i++)
+            diff[i][j]=diff[i+1][j-1]-diff[i][j-1];
+
+    double h = x-x;[3]
+    double u = (xp - x)/h;
+
+    double yp = diff;
+    double uterm = 1.0, fact = 1.0;
+    for(int j=1;j<n;j++){
+        uterm *= (u-(j-1));
+        fact *= j;
+        yp += (uterm/fact)*diff[j];
+    }
+
+    cout.setf(std::ios::fixed); cout<<setprecision(10);
+    cout << "y("<<xp<<") ~ " << yp << "\n";
+    return 0;
+}
+```
 
 ---
 
-### Newton Backward Interpolation
+### Newton Backward
 
-**Use when:** points are equally spaced and `x` is near the end of the table.
+**File:** `Interpolation/newton_backward.cpp`  
+**Note:** Requires equally spaced `x`.
 
-**Inputs**
-- Equally spaced \((x_i, y_i)\)
-- Target `x`
+```
+#include <bits/stdc++.h>
+using namespace std;
 
-**Outputs**
-- Approximated `y(x)`
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-**Code**
-- File: `./Interpolation/NewtonBackward/...`
+    int n; cin >> n;
+    vector<double> x(n), y(n);
+    for(int i=0;i<n;i++) cin >> x[i] >> y[i];
+    double xp; cin >> xp;
+
+    vector<vector<double>> diff(n, vector<double>(n,0.0));
+    for(int i=0;i<n;i++) diff[i]=y[i];
+    for(int j=1;j<n;j++)
+        for(int i=n-1;i>=j;i--)
+            diff[i][j]=diff[i][j-1]-diff[i-1][j-1];
+
+    double h = x-x;[3]
+    double u = (xp - x[n-1])/h;
+
+    double yp = diff[n-1];
+    double uterm = 1.0, fact = 1.0;
+    for(int j=1;j<n;j++){
+        uterm *= (u+(j-1));
+        fact *= j;
+        yp += (uterm/fact)*diff[n-1][j];
+    }
+
+    cout.setf(std::ios::fixed); cout<<setprecision(10);
+    cout << "y("<<xp<<") ~ " << yp << "\n";
+    return 0;
+}
+```
 
 ---
 
-### Newton Divided Difference
+### Divided Difference
 
-**Use when:** x values are NOT equally spaced (works for general spacing).
+**File:** `Interpolation/divided_difference.cpp`  
+**Note:** Works for non-equally spaced points.
 
-**Inputs**
-- General \((x_i, y_i)\)
-- Target `x`
+```
+#include <bits/stdc++.h>
+using namespace std;
 
-**Outputs**
-- Approximated `y(x)`
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-**Code**
-- File: `./Interpolation/DividedDifference/...`
+    int n; cin >> n;
+    vector<double> x(n);
+    vector<vector<double>> dd(n, vector<double>(n,0.0));
+
+    for(int i=0;i<n;i++){
+        cin >> x[i] >> dd[i];
+    }
+    double xp; cin >> xp;
+
+    for(int j=1;j<n;j++){
+        for(int i=0;i<n-j;i++){
+            dd[i][j] = (dd[i+1][j-1]-dd[i][j-1])/(x[i+j]-x[i]);
+        }
+    }
+
+    double yp = dd;
+    double term = 1.0;
+    for(int j=1;j<n;j++){
+        term *= (xp - x[j-1]);
+        yp += term * dd[j];
+    }
+
+    cout.setf(std::ios::fixed); cout<<setprecision(10);
+    cout << "y("<<xp<<") ~ " << yp << "\n";
+    return 0;
+}
+```
 
 ---
 
 ## Numerical Integration
 
-### Simpson's 1/3 Rule
+> Edit `f(x)` inside each file.
 
-**Goal:** Approximate \(\int_a^b f(x)\,dx\) using parabolic segments.
+### Simpson 1/3
 
-**Inputs**
-- `f(x)`, `a`, `b`
-- `n` (must be even)
+**File:** `Integration/simpson_1_3.cpp`  
+**Note:** `n` must be even.
 
-**Outputs**
-- Approximate integral value
+```
+#include <bits/stdc++.h>
+using namespace std;
 
-**Code**
-- File: `./Integration/Simpson_1_3/...`
+double f(double x){
+    return 1.0/(1.0+x*x); // example
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    double a,b; int n;
+    cin >> a >> b >> n;
+    if(n%2!=0){
+        cout << "n must be even.\n";
+        return 0;
+    }
+
+    double h = (b-a)/n;
+    double sum = f(a) + f(b);
+    for(int i=1;i<n;i++){
+        double x = a + i*h;
+        sum += (i%2? 4.0 : 2.0) * f(x);
+    }
+    double ans = (h/3.0)*sum;
+
+    cout.setf(std::ios::fixed); cout<<setprecision(10);
+    cout << "Integral ~ " << ans << "\n";
+    return 0;
+}
+```
 
 ---
 
-### Simpson's 3/8 Rule
+### Simpson 3/8
 
-**Goal:** Approximate \(\int_a^b f(x)\,dx\) using cubic interpolation segments.
+**File:** `Integration/simpson_3_8.cpp`  
+**Note:** `n` must be a multiple of 3.
 
-**Inputs**
-- `f(x)`, `a`, `b`
-- `n` (must be multiple of 3)
+```
+#include <bits/stdc++.h>
+using namespace std;
 
-**Outputs**
-- Approximate integral value
+double f(double x){
+    return 1.0/(1.0+x*x); // example
+}
 
-**Code**
-- File: `./Integration/Simpson_3_8/...`
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    double a,b; int n;
+    cin >> a >> b >> n;
+    if(n%3!=0){
+        cout << "n must be multiple of 3.\n";
+        return 0;
+    }
+
+    double h = (b-a)/n;
+    double sum = f(a) + f(b);
+
+    for(int i=1;i<n;i++){
+        double x = a + i*h;
+        sum += (i%3==0 ? 2.0 : 3.0) * f(x);
+    }
+
+    double ans = (3.0*h/8.0)*sum;
+
+    cout.setf(std::ios::fixed); cout<<setprecision(10);
+    cout << "Integral ~ " << ans << "\n";
+    return 0;
+}
+```
 
 ---
 
 ## Numerical Differentiation
 
-**Goal:** Approximate derivatives when symbolic differentiation is difficult.
+**File:** `Differentiation/numerical_diff.cpp`  
+Computes approximate \(f'(x)\) using forward/backward/central difference.
 
-**Typical Methods Included**
-- Forward difference
-- Backward difference
-- Central difference
-- Higher-order formulas (if implemented)
+```
+#include <bits/stdc++.h>
+using namespace std;
 
-**Inputs**
-- `f(x)` or tabulated points
-- Point `x`
-- Step size `h`
+double f(double x){
+    return sin(x); // example
+}
 
-**Outputs**
-- Approximation of \(f'(x)\) (and optionally \(f''(x)\))
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-**Code**
-- File: `./Differentiation/...`
+    double x,h;
+    cin >> x >> h;
+
+    double forward  = (f(x+h)-f(x))/h;
+    double backward = (f(x)-f(x-h))/h;
+    double central  = (f(x+h)-f(x-h))/(2*h);
+
+    cout.setf(std::ios::fixed); cout<<setprecision(10);
+    cout << "Forward  f'(x) ~ " << forward  << "\n";
+    cout << "Backward f'(x) ~ " << backward << "\n";
+    cout << "Central  f'(x) ~ " << central  << "\n";
+    return 0;
+}
+```
 
 ---
 
-## Least Squares Regression
+## Least Squares
 
 ### Linear Regression
 
-**Model**
-- Fit: \(y = a + bx\)
+**Model:** \(y = a + bx\)  
+**File:** `LeastSquares/linear_regression.cpp`
 
-**Inputs**
-- Data points \((x_i, y_i)\)
+```
+#include <bits/stdc++.h>
+using namespace std;
 
-**Outputs**
-- Parameters `a`, `b`
-- (Optional) predicted values and error metrics
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
 
-**Code**
-- File: `./LeastSquares/Linear/...`
+    int n; cin >> n;
+    vector<double> x(n), y(n);
+    for(int i=0;i<n;i++) cin >> x[i] >> y[i];
+
+    double sx=0, sy=0, sxx=0, sxy=0;
+    for(int i=0;i<n;i++){
+        sx += x[i]; sy += y[i];
+        sxx += x[i]*x[i];
+        sxy += x[i]*y[i];
+    }
+
+    double den = n*sxx - sx*sx;
+    if (fabs(den) < 1e-15){
+        cout << "Cannot fit (denominator near zero).\n";
+        return 0;
+    }
+    double b = (n*sxy - sx*sy)/den;
+    double a = (sy - b*sx)/n;
+
+    cout.setf(std::ios::fixed); cout<<setprecision(10);
+    cout << "a = " << a << "\n";
+    cout << "b = " << b << "\n";
+    cout << "Fitted: y = a + b*x\n";
+    return 0;
+}
+```
 
 ---
 
 ### Polynomial Regression
 
-**Model**
-- Fit: \(y = a_0 + a_1 x + a_2 x^2 + \dots + a_m x^m\)
+**Model:** \(y = a_0 + a_1 x + \dots + a_m x^m\)  
+**File:** `LeastSquares/polynomial_regression.cpp`
 
-**Inputs**
-- \((x_i, y_i)\), degree `m`
+```
+#include <bits/stdc++.h>
+using namespace std;
 
-**Outputs**
-- Coefficients \(a_0..a_m\)
+static const double EPS = 1e-12;
 
-**Code**
-- File: `./LeastSquares/Polynomial/...`
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n, m;
+    cin >> n >> m;              // n points, degree m
+    vector<double> x(n), y(n);
+    for(int i=0;i<n;i++) cin >> x[i] >> y[i];
+
+    int dim = m+1;
+    vector<vector<double>> A(dim, vector<double>(dim,0.0));
+    vector<double> B(dim,0.0);
+
+    // Build normal equations
+    vector<double> sx(2*m+1,0.0);
+    for(int k=0;k<=2*m;k++){
+        for(int i=0;i<n;i++) sx[k] += pow(x[i], k);
+    }
+    for(int i=0;i<dim;i++){
+        for(int j=0;j<dim;j++) A[i][j] = sx[i+j];
+        for(int t=0;t<n;t++) B[i] += y[t]*pow(x[t], i);
+    }
+
+    // Solve A * coeff = B using Gauss elimination
+    vector<vector<double>> aug(dim, vector<double>(dim+1));
+    for(int i=0;i<dim;i++){
+        for(int j=0;j<dim;j++) aug[i][j]=A[i][j];
+        aug[i][dim]=B[i];
+    }
+
+    for(int col=0; col<dim; col++){
+        int pivot=col;
+        for(int r=col;r<dim;r++)
+            if (fabs(aug[r][col]) > fabs(aug[pivot][col])) pivot=r;
+        if (fabs(aug[pivot][col]) < EPS){
+            cout << "Cannot fit (singular normal matrix).\n";
+            return 0;
+        }
+        swap(aug[pivot], aug[col]);
+        for(int r=col+1;r<dim;r++){
+            double factor = aug[r][col]/aug[col][col];
+            for(int k=col;k<=dim;k++) aug[r][k]-=factor*aug[col][k];
+        }
+    }
+
+    vector<double> c(dim);
+    for(int i=dim-1;i>=0;i--){
+        double sum=aug[i][dim];
+        for(int j=i+1;j<dim;j++) sum-=aug[i][j]*c[j];
+        c[i]=sum/aug[i][i];
+    }
+
+    cout.setf(std::ios::fixed); cout<<setprecision(10);
+    for(int i=0;i<dim;i++) cout << "a" << i << " = " << c[i] << "\n";
+    return 0;
+}
+```
 
 ---
 
 ### Transcendental Regression
 
-**Common Models**
-- Exponential: \(y = a e^{bx}\)
-- Power: \(y = a x^b\)
-- Logarithmic: \(y = a + b\ln(x)\)
+Supports common transforms:
+- Exponential: \(y = a e^{bx}\)  →  \(\ln y = \ln a + bx\)
+- Power: \(y = a x^b\)          →  \(\ln y = \ln a + b\ln x\)
 
-**Inputs**
-- \((x_i, y_i)\)
-- Selected model type
-
-**Outputs**
-- Model parameters and fitted equation
-
-**Code**
-- File: `./LeastSquares/Transcendental/...`
-
----
-
-## RungeKutta (ODE)
-
-**Goal:** Numerically solve an ODE like \(y' = f(x,y)\) with an initial condition \(y(x_0)=y_0\).
-
-**Common Version**
-- 4th order Runge–Kutta (RK4)
-
-**Inputs**
-- Function `f(x, y)`
-- `x0`, `y0`
-- Step size `h`
-- Number of steps `n` (or final `x`)
-
-**Outputs**
-- Approximated values of `y` over the interval
-- (Optional) table of `(x, y)` values
-
-**Code**
-- File: `./ODE/RungeKutta/...`
-
----
-
-## Project Structure
-
-> Edit folder names to match your repository.
+**File:** `LeastSquares/transcendental_regression.cpp`
 
 ```
-Numerical-Methods-Laboratory/
-│
-├─ Linear/
-│  ├─ GaussElimination/
-│  ├─ GaussJordan/
-│  ├─ LU/
-│  └─ MatrixInverse/
-│
-├─ NonLinear/
-│  ├─ Bisection/
-│  ├─ FalsePosition/
-│  ├─ Secant/
-│  └─ NewtonRaphson/
-│
-├─ Interpolation/
-│  ├─ NewtonForward/
-│  ├─ NewtonBackward/
-│  └─ DividedDifference/
-│
-├─ Integration/
-│  ├─ Simpson_1_3/
-│  └─ Simpson_3_8/
-│
-├─ Differentiation/
-│
-├─ LeastSquares/
-│  ├─ Linear/
-│  ├─ Polynomial/
-│  └─ Transcendental/
-│
-├─ ODE/
-│  └─ RungeKutta/
-│
-└─ README.md
+#include <bits/stdc++.h>
+using namespace std;
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n; cin >> n;
+    int mode; 
+    // 1 = exponential (y = a e^(b x))
+    // 2 = power       (y = a x^b)
+    cin >> mode;
+
+    vector<double> X(n), Y(n);
+    for(int i=0;i<n;i++) cin >> X[i] >> Y[i];
+
+    vector<double> u(n), v(n);
+    for(int i=0;i<n;i++){
+        if (Y[i] <= 0){
+            cout << "All y must be > 0 for log transform.\n";
+            return 0;
+        }
+        if (mode==1){
+            u[i] = X[i];
+            v[i] = log(Y[i]);
+        } else if (mode==2){
+            if (X[i] <= 0){
+                cout << "All x must be > 0 for power model.\n";
+                return 0;
+            }
+            u[i] = log(X[i]);
+            v[i] = log(Y[i]);
+        } else {
+            cout << "Invalid mode.\n";
+            return 0;
+        }
+    }
+
+    double su=0, sv=0, suu=0, suv=0;
+    for(int i=0;i<n;i++){
+        su += u[i]; sv += v[i];
+        suu += u[i]*u[i];
+        suv += u[i]*v[i];
+    }
+
+    double den = n*suu - su*su;
+    if (fabs(den) < 1e-15){
+        cout << "Cannot fit (denominator near zero).\n";
+        return 0;
+    }
+
+    double b = (n*suv - su*sv)/den;
+    double A = (sv - b*su)/n; // A = ln(a)
+    double a = exp(A);
+
+    cout.setf(std::ios::fixed); cout<<setprecision(10);
+    cout << "a = " << a << "\n";
+    cout << "b = " << b << "\n";
+    if (mode==1) cout << "Fitted: y = a * exp(b*x)\n";
+    if (mode==2) cout << "Fitted: y = a * x^b\n";
+    return 0;
+}
 ```
 
 ---
 
-## Adding a New Method
+## Runge Kutta
 
-1. Create a folder under the correct category.
-2. Add code file(s) and (optional) sample input/output.
-3. Add a short section under **Implemented Methods** with:
-   - Goal
-   - Inputs/Outputs
-   - Algorithm (high-level)
-   - File link/path
+**Goal:** Solve \(y' = f(x,y)\) using RK4.  
+**File:** `ODE/runge_kutta_rk4.cpp`
 
----
-
-## Contributing
-
-Contributions are welcome.
-
-- Fork the repository
-- Create a feature branch
-- Commit changes with clear messages
-- Open a pull request
-
----
-
-## License
-
-Add a license if you want (recommended). Example:
-
-This project is licensed under the MIT License - see the `LICENSE` file for details.
-
----
-
-## Acknowledgements
-
-- Course: Numerical Methods Laboratory
-- Instructor/Department: _Add your info_
-- Teammates/Contributors: _Add names (optional)_
 ```
+#include <bits/stdc++.h>
+using namespace std;
+
+double f(double x, double y){
+    // Example: y' = x + y
+    return x + y;
+}
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    double x0, y0, h;
+    int n;
+    cin >> x0 >> y0 >> h >> n;
+
+    double x=x0, y=y0;
+    cout.setf(std::ios::fixed); cout<<setprecision(10);
+    cout << "x y\n";
+    cout << x << " " << y << "\n";
+
+    for(int i=1;i<=n;i++){
+        double k1 = h * f(x, y);
+        double k2 = h * f(x + h/2.0, y + k1/2.0);
+        double k3 = h * f(x + h/2.0, y + k2/2.0);
+        double k4 = h * f(x + h,     y + k3);
+        y += (k1 + 2*k2 + 2*k3 + k4)/6.0;
+        x += h;
+        cout << x << " " << y << "\n";
+    }
+    return 0;
+}
+```
+
+---
+```
+
 
 
 
