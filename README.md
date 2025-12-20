@@ -1,3 +1,588 @@
+Gaussian elimination is commonly described as a step-by-step procedure that solves linear systems by applying row operations to transform the augmented matrix into (upper) row‑echelon form before back‑substitution.[1]
+Below is a complete, ready-to-paste `README.md` structure (with all your requested topics) that you can edit to match your exact file names and languages.
+
+```markdown
+# Numerical Methods Laboratory
+
+A collection of Numerical Methods lab implementations covering **linear** systems, **non-linear** equations, **interpolation**, **numerical integration/differentiation**, **least squares regression**, and **Runge–Kutta** methods.
+
+---
+
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [How to Run](#how-to-run)
+  - [Input/Output Convention](#inputoutput-convention)
+- [Implemented Methods](#implemented-methods)
+  - [Linear Methods](#linear-methods)
+    - [Gauss Elimination](#gauss-elimination)
+    - [Gauss-Jordan](#gauss-jordan)
+    - [LU Decomposition](#lu-decomposition)
+    - [Matrix Inversion](#matrix-inversion)
+  - [Non-linear Methods](#non-linear-methods)
+    - [Bisection Method](#bisection-method)
+    - [False Position (Regula Falsi)](#false-position-regula-falsi)
+    - [Secant Method](#secant-method)
+    - [Newton–Raphson Method](#newtonraphson-method)
+  - [Interpolation](#interpolation)
+    - [Newton Forward Interpolation](#newton-forward-interpolation)
+    - [Newton Backward Interpolation](#newton-backward-interpolation)
+    - [Newton Divided Difference](#newton-divided-difference)
+  - [Numerical Integration](#numerical-integration)
+    - [Simpson’s 1/3 Rule](#simpsons-13-rule)
+    - [Simpson’s 3/8 Rule](#simpsons-38-rule)
+  - [Numerical Differentiation](#numerical-differentiation)
+  - [Least Squares Regression](#least-squares-regression)
+    - [Linear Regression](#linear-regression)
+    - [Polynomial Regression](#polynomial-regression)
+    - [Transcendental Regression](#transcendental-regression)
+  - [Runge–Kutta (ODE)](#rungekutta-ode)
+- [Project Structure](#project-structure)
+- [Adding a New Method](#adding-a-new-method)
+- [Contributing](#contributing)
+- [License](#license)
+- [Acknowledgements](#acknowledgements)
+
+---
+
+## Project Overview
+
+This repository is designed for Numerical Methods laboratory work and practice.
+Each method includes a short description, expected inputs/outputs, and code implementation.
+
+---
+
+## Features
+
+- Clear separation by topic (Linear / Non-linear / Interpolation / Integration / etc.)
+- Standard tolerance-based stopping criteria for iterative methods
+- Example input format included for quick testing
+- Easy-to-extend structure for adding more methods
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+Update this section depending on your language:
+
+- **C/C++**: GCC / G++ (or CodeBlocks)
+- **Python**: Python 3.x
+- **MATLAB/Octave** (optional): If you used MATLAB/Octave scripts
+
+### How to Run
+
+> Replace file names below with your actual file paths.
+
+#### C/C++ (example)
+```
+# Compile
+g++ path/to/file.cpp -o run
+
+# Run
+./run
+```
+
+#### Python (example)
+```
+python path/to/file.py
+```
+
+### Input/Output Convention
+
+Use a consistent format across programs (recommended):
+
+- **Inputs** (typical):
+  - Matrix size `n`
+  - Coefficient matrix `A`
+  - RHS vector `b`
+  - Initial guesses / bracket `[a, b]`
+  - Tolerance `eps`
+  - Maximum iteration `maxIter`
+
+- **Outputs** (typical):
+  - Approximated solution (vector or root)
+  - Iteration table (optional but recommended)
+  - Error value per iteration (optional)
+
+---
+
+## Implemented Methods
+
+## Linear Methods
+
+### Gauss Elimination
+
+**Goal:** Solve a system of linear equations \(Ax=b\) using forward elimination + back substitution.
+
+**Inputs**
+- `n` (order of the system)
+- `A` (coefficient matrix)
+- `b` (constant vector)
+- (Optional) pivoting on/off
+
+**Outputs**
+- Solution vector `x`
+- (Optional) transformed upper-triangular matrix
+
+**Algorithm (high-level)**
+- Build the augmented matrix \([A|b]\)
+- Forward eliminate below the diagonal
+- Back substitute to obtain `x`
+
+**Code**
+- File: `./Linear/GaussElimination/...`
+- Link: _Add your GitHub file link here_
+
+**Sample**
+- Input: _Put a small example here_
+- Output: _Expected output here_
+
+---
+
+### Gauss-Jordan
+
+**Goal:** Solve \(Ax=b\) by transforming \([A|b]\) to reduced row echelon form (RREF).
+
+**Inputs**
+- `n`, `A`, `b`
+
+**Outputs**
+- Solution vector `x`
+- (Optional) RREF matrix
+
+**Algorithm (high-level)**
+- Make pivot 1
+- Make all other entries in pivot column 0
+- Read solution directly
+
+**Code**
+- File: `./Linear/GaussJordan/...`
+
+---
+
+### LU Decomposition
+
+**Goal:** Factorize \(A = LU\) and solve \(Ax=b\) via forward/back substitution.
+
+**Common Variants**
+- Doolittle (diagonal of `L` is 1)
+- Crout (diagonal of `U` is 1)
+
+**Inputs**
+- `n`, `A`, `b`
+
+**Outputs**
+- Matrices `L` and `U`
+- Solution vector `x`
+
+**Algorithm (high-level)**
+- Decompose `A` into `L` and `U`
+- Solve `Ly=b` (forward substitution)
+- Solve `Ux=y` (back substitution)
+
+**Code**
+- File: `./Linear/LU/...`
+
+---
+
+### Matrix Inversion
+
+**Goal:** Compute \(A^{-1}\) (if it exists), typically using Gauss-Jordan on \([A|I]\).
+
+**Inputs**
+- `n`, `A`
+
+**Outputs**
+- `A_inv` or message: "Singular matrix"
+
+**Algorithm (high-level)**
+- Form augmented matrix \([A|I]\)
+- Apply Gauss-Jordan
+- Extract inverse from the right block
+
+**Code**
+- File: `./Linear/MatrixInverse/...`
+
+---
+
+## Non-linear Methods
+
+### Bisection Method
+
+**Goal:** Find a root of \(f(x)=0\) in an interval \([a,b]\) where \(f(a)\cdot f(b) < 0\).
+
+**Inputs**
+- Function `f(x)`
+- `a`, `b`
+- `eps`, `maxIter`
+
+**Outputs**
+- Approximated root `x`
+- Iteration count (optional)
+
+**Algorithm (high-level)**
+- Compute midpoint `c=(a+b)/2`
+- Choose subinterval that preserves sign change
+- Stop when error < `eps` or `f(c)==0`
+
+**Code**
+- File: `./NonLinear/Bisection/...`
+
+---
+
+### False Position (Regula Falsi)
+
+**Goal:** Find a root in \([a,b]\) using a secant line but keeping the bracket.
+
+**Inputs**
+- `f(x)`, `a`, `b`, `eps`, `maxIter`
+
+**Outputs**
+- Approximated root
+
+**Algorithm (high-level)**
+- Compute intersection point using straight line through \((a,f(a))\) and \((b,f(b))\)
+- Replace `a` or `b` depending on sign
+- Repeat until convergence
+
+**Code**
+- File: `./NonLinear/FalsePosition/...`
+
+---
+
+### Secant Method
+
+**Goal:** Find a root using secant updates (no derivative needed).
+
+**Inputs**
+- `f(x)`
+- Two initial guesses `x0`, `x1`
+- `eps`, `maxIter`
+
+**Outputs**
+- Approximated root
+
+**Algorithm (high-level)**
+- Iteratively compute the next point from the secant line through the last two points
+
+**Code**
+- File: `./NonLinear/Secant/...`
+
+---
+
+### NewtonRaphson Method
+
+**Goal:** Find a root using derivative-based iteration.
+
+**Inputs**
+- `f(x)`, `f'(x)`
+- Initial guess `x0`
+- `eps`, `maxIter`
+
+**Outputs**
+- Approximated root
+
+**Algorithm (high-level)**
+- Update: `x_{k+1} = x_k - f(x_k)/f'(x_k)`
+- Stop when error < `eps` or iteration limit reached
+
+**Code**
+- File: `./NonLinear/NewtonRaphson/...`
+
+---
+
+## Interpolation
+
+### Newton Forward Interpolation
+
+**Use when:** points are equally spaced and `x` is near the beginning of the table.
+
+**Inputs**
+- Data points \((x_i, y_i)\) (equal spacing)
+- Target `x`
+
+**Outputs**
+- Approximated `y(x)`
+
+**Code**
+- File: `./Interpolation/NewtonForward/...`
+
+---
+
+### Newton Backward Interpolation
+
+**Use when:** points are equally spaced and `x` is near the end of the table.
+
+**Inputs**
+- Equally spaced \((x_i, y_i)\)
+- Target `x`
+
+**Outputs**
+- Approximated `y(x)`
+
+**Code**
+- File: `./Interpolation/NewtonBackward/...`
+
+---
+
+### Newton Divided Difference
+
+**Use when:** x values are NOT equally spaced (works for general spacing).
+
+**Inputs**
+- General \((x_i, y_i)\)
+- Target `x`
+
+**Outputs**
+- Approximated `y(x)`
+
+**Code**
+- File: `./Interpolation/DividedDifference/...`
+
+---
+
+## Numerical Integration
+
+### Simpson's 1/3 Rule
+
+**Goal:** Approximate \(\int_a^b f(x)\,dx\) using parabolic segments.
+
+**Inputs**
+- `f(x)`, `a`, `b`
+- `n` (must be even)
+
+**Outputs**
+- Approximate integral value
+
+**Code**
+- File: `./Integration/Simpson_1_3/...`
+
+---
+
+### Simpson's 3/8 Rule
+
+**Goal:** Approximate \(\int_a^b f(x)\,dx\) using cubic interpolation segments.
+
+**Inputs**
+- `f(x)`, `a`, `b`
+- `n` (must be multiple of 3)
+
+**Outputs**
+- Approximate integral value
+
+**Code**
+- File: `./Integration/Simpson_3_8/...`
+
+---
+
+## Numerical Differentiation
+
+**Goal:** Approximate derivatives when symbolic differentiation is difficult.
+
+**Typical Methods Included**
+- Forward difference
+- Backward difference
+- Central difference
+- Higher-order formulas (if implemented)
+
+**Inputs**
+- `f(x)` or tabulated points
+- Point `x`
+- Step size `h`
+
+**Outputs**
+- Approximation of \(f'(x)\) (and optionally \(f''(x)\))
+
+**Code**
+- File: `./Differentiation/...`
+
+---
+
+## Least Squares Regression
+
+### Linear Regression
+
+**Model**
+- Fit: \(y = a + bx\)
+
+**Inputs**
+- Data points \((x_i, y_i)\)
+
+**Outputs**
+- Parameters `a`, `b`
+- (Optional) predicted values and error metrics
+
+**Code**
+- File: `./LeastSquares/Linear/...`
+
+---
+
+### Polynomial Regression
+
+**Model**
+- Fit: \(y = a_0 + a_1 x + a_2 x^2 + \dots + a_m x^m\)
+
+**Inputs**
+- \((x_i, y_i)\), degree `m`
+
+**Outputs**
+- Coefficients \(a_0..a_m\)
+
+**Code**
+- File: `./LeastSquares/Polynomial/...`
+
+---
+
+### Transcendental Regression
+
+**Common Models**
+- Exponential: \(y = a e^{bx}\)
+- Power: \(y = a x^b\)
+- Logarithmic: \(y = a + b\ln(x)\)
+
+**Inputs**
+- \((x_i, y_i)\)
+- Selected model type
+
+**Outputs**
+- Model parameters and fitted equation
+
+**Code**
+- File: `./LeastSquares/Transcendental/...`
+
+---
+
+## RungeKutta (ODE)
+
+**Goal:** Numerically solve an ODE like \(y' = f(x,y)\) with an initial condition \(y(x_0)=y_0\).
+
+**Common Version**
+- 4th order Runge–Kutta (RK4)
+
+**Inputs**
+- Function `f(x, y)`
+- `x0`, `y0`
+- Step size `h`
+- Number of steps `n` (or final `x`)
+
+**Outputs**
+- Approximated values of `y` over the interval
+- (Optional) table of `(x, y)` values
+
+**Code**
+- File: `./ODE/RungeKutta/...`
+
+---
+
+## Project Structure
+
+> Edit folder names to match your repository.
+
+```
+Numerical-Methods-Laboratory/
+│
+├─ Linear/
+│  ├─ GaussElimination/
+│  ├─ GaussJordan/
+│  ├─ LU/
+│  └─ MatrixInverse/
+│
+├─ NonLinear/
+│  ├─ Bisection/
+│  ├─ FalsePosition/
+│  ├─ Secant/
+│  └─ NewtonRaphson/
+│
+├─ Interpolation/
+│  ├─ NewtonForward/
+│  ├─ NewtonBackward/
+│  └─ DividedDifference/
+│
+├─ Integration/
+│  ├─ Simpson_1_3/
+│  └─ Simpson_3_8/
+│
+├─ Differentiation/
+│
+├─ LeastSquares/
+│  ├─ Linear/
+│  ├─ Polynomial/
+│  └─ Transcendental/
+│
+├─ ODE/
+│  └─ RungeKutta/
+│
+└─ README.md
+```
+
+---
+
+## Adding a New Method
+
+1. Create a folder under the correct category.
+2. Add code file(s) and (optional) sample input/output.
+3. Add a short section under **Implemented Methods** with:
+   - Goal
+   - Inputs/Outputs
+   - Algorithm (high-level)
+   - File link/path
+
+---
+
+## Contributing
+
+Contributions are welcome.
+
+- Fork the repository
+- Create a feature branch
+- Commit changes with clear messages
+- Open a pull request
+
+---
+
+## License
+
+Add a license if you want (recommended). Example:
+
+This project is licensed under the MIT License - see the `LICENSE` file for details.
+
+---
+
+## Acknowledgements
+
+- Course: Numerical Methods Laboratory
+- Instructor/Department: _Add your info_
+- Teammates/Contributors: _Add names (optional)_
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # **Bisection & False Position Methods**
 
 
