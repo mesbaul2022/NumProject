@@ -1,11 +1,9 @@
 # Numerical Lab Project (C++)
 
-Numerical Methods Laboratory implementations in **C++**: solution of linear equations, non-linear root finding, interpolation, numerical integration & differentiation, least squares regression, and Runge–Kutta (ODE).
+## Overview
+- Purpose: A curated set of classic numerical methods implemented in C++ with clear theory notes, sample inputs, and generated outputs.
+- What's inside: Linear systems (Gauss, Gauss–Jordan, LU, Matrix Inversion), nonlinear root finding (Bisection, False Position, Secant, Newton–Raphson), interpolation (Newton forward/backward/divided differences), numerical differentiation (forward/backward), numerical integration (Simpson’s 1/3 and 3/8 rules), ODE solving (Runge–Kutta 4th order), and curve fitting (linear, polynomial, transcendental)
 
----
-
-##Project Overview:
-- [Overview](overview)
 ---
 
 ## Table of Contents
