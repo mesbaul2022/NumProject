@@ -1739,14 +1739,48 @@ int main(){
 
 ---
 
-## Least Squares
+## Solution of Curve Fitting Model
 
-### Linear Regression
+### Least Square Regression Method For Linear Equations Method
 
-**Model:** \(y = a + bx\)  
-**File:** `LeastSquares/linear_regression.cpp`
+#### Least Square Regression Method For Linear Equations Theory
+#### Method used
+**Least Squares Regression – Linear Equation**
 
+#### Objective
+To fit a straight line of the form 
 ```
+y = a + bx
+```
+that best represents the given experimental data.
+
+#### Data Requirement
+A set of `n` observed data points:
+```
+(x1, y1), (x2, y2), ..., (xn, yn)
+```
+
+#### Core Idea
+The best-fitting straight line is obtained by minimizing the **sum of squares of vertical deviations** (errors) between the observed data points and the assumed line.
+
+#### Assumed Model
+```
+y = a + bx
+```
+
+#### Least Squares Conditions
+To minimize error:
+```
+∑(y − a − bx)² → minimum
+```
+This leads to the **normal equations**:
+```
+∑y = na + b∑x
+∑xy = a∑x + b∑x²
+```
+
+#### Least Square Regression Method For Linear Equations Code
+```cpp
 #include <bits/stdc++.h>
 using namespace std;
 // Linear Regression: y = a + b*x
@@ -1788,16 +1822,218 @@ int main()
     return 0;
 }
 
+
 ```
 
+#### Least Square Regression Method For Linear Equations Input
+```
+5
+1 2 3 4 5
+2 4 5 4 5
+```
+
+#### Least Square Regression Method For Linear Equations Output
+```
+Enter the number of data: 5
+Enter the values of x: 1 2 3 4 5
+Enter the values of y: 2 4 5 4 5
+The linear equation is: y = 2.2000 + 0.6000*x
+The value of y at x = 5.0000 is: 5.2000
+
+```
+#### [Back to Contents](#table-of-contents)
 ---
 
-### Polynomial Regression
+### Least Square Regression Method For Transcendental Equations 
 
-**Model:** \(y = a_0 + a_1 x + \dots + a_m x^m\)  
-**File:** `LeastSquares/polynomial_regression.cpp`
+#### Least Square Regression Method For Transcendental Equations Theory
+#### Method used
+**Least Squares Regression – Transcendental Equation**
+
+#### Objective
+To fit nonlinear relationships by transforming them into linear form so that least squares method can be applied.
+
+#### Common Transcendental Forms
+1. **Exponential model**
+```
+y = ae^(bx)
+```
+
+2. **Power model**
+```
+y = ax^b
+```
+
+#### Linearization Technique
+
+##### Exponential Equation
+Taking natural logarithm:
+```
+ln y = ln a + bx
+```
+Let:
+```
+Y = ln y , A = ln a
+```
+Then:
+```
+Y = A + bx
+```
+
+##### Power Equation
+Taking logarithm on both sides:
+```
+log y = log a + b log x
+```
+
+Let:
+```
+Y = log y , X = log x , A = log a
+```
+Then:
+```
+Y = A + bX
+```
+#### Evaluation Process
+- Transform the given data
+- Apply linear least squares regression
+- Compute constants
+- Convert back to original form
+
+#### Accuracy Considerations
+- Transformation may amplify errors
+- Requires positive data values
+- Fit quality depends on correct model assumption
+
+#### Applicability
+- Used in population growth, decay processes, and empirical laws
+- Suitable for nonlinear experimental data
+
+
+#### Least Square Regression Method For Transcendental Equations Code
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+// fitting a linear line
+// y = a + be^(x/4)
+// y = a + bx' = a+bf(x)
+// x' = f(x) = e^(x/4)
+
+pair<double, double> linear_reg(vector<double> vx, vector<double> vy)
+{
+    double n = vx.size();
+    double x = 0, xy = 0, y = 0, x2 = 0;
+    for (int i = 0; i < n; i++)
+    {
+        x += exp(vx[i] / 4);
+        y += vy[i];
+        xy += exp(vx[i] / 4) * vy[i];
+        x2 += exp(vx[i] / 4) * exp(vx[i] / 4);
+    }
+    double b = (n * xy - x * y) / (n * x2 - x * x);
+    double a = (y - b * x) / n;
+    return {b, a};
+}
+
+int main()
+{
+    int n;
+    cout << "Enter the no of points: ";
+    cin >> n;
+    vector<double> vx(n), vy(n);
+    cout << "Enter values of x: " << endl;
+    for (int i = 0; i < n; i++)
+    {
+        cin >> vx[i];
+        cin >> vy[i];
+    }
+
+    auto [b, a] = linear_reg(vx, vy);
+    cout << "y = " << a << " + " << b << "e^(x/4)" << endl;
+    cout << "Enter any value of x: ";
+    double x;
+    cin >> x;
+    cout << "y(" << x << ") = " << a + b * exp(x / 4) << endl;
+}
+
 
 ```
+
+#### Least Square Regression Method For Transcendental Equations Input
+```
+5
+0 2
+1 3.718
+2 6.389
+3 10.109
+4 15.0
+2
+```
+
+#### Least Square Regression Method For Transcendental Equations Output
+```
+Enter the no of points: 5
+Enter values of x:
+0 2
+1 3.718
+2 6.389
+3 10.109
+4 15.0
+y = -5.94885 + 7.63686e^(x/4)
+Enter any value of x: 2
+y(2) = 6.64221
+
+```
+#### [Back to Contents](#table-of-contents)
+---
+
+### Least Square Regression Method For Polynomial Equations 
+
+#### Least Square Regression Method For Polynomial Equations Theory
+#### Method used
+**Least Squares Regression – Polynomial Equation**
+
+#### Objective
+To fit a polynomial curve when linear regression is insufficient to represent data trends.
+
+#### Assumed Model (Second Order Polynomial)
+```
+y = a + bx + cx²
+```
+
+#### Data Requirement
+A set of experimental observations:
+```
+(x1, y1), (x2, y2), ..., (xn, yn)
+```
+
+#### Core Idea
+The coefficients of the polynomial are determined by minimizing the sum of squared deviations between observed and computed values.
+
+#### Normal Equations
+For a second-degree polynomial:
+```
+∑y = na + b∑x + c∑x²
+∑xy = a∑x + b∑x² + c∑x³
+∑x²y = a∑x² + b∑x³ + c∑x⁴
+```
+#### Evaluation Process
+- Compute required summations from data table
+- Solve the system of equations
+- Substitute coefficients into polynomial
+
+#### Accuracy Considerations
+- Higher degree improves fit but may cause overfitting
+- Computational complexity increases with degree
+- Sensitive to data errors
+
+#### Applicability
+- Used when data shows curvature
+- Suitable for engineering and experimental modeling
+
+#### Least Square Regression Method For Polynomial Equations Code
+```cpp
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -1881,68 +2117,30 @@ int main()
     return 0;
 }
 
+
+
 ```
 
+#### Least Square Regression Method For Polynomial Equations Input
+```
+2
+5
+1 2 3 4 5
+1 4 9 16 25
+
+```
+
+#### Least Square Regression Method For Polynomial Equations Output
+```
+Enter the degree: 2
+Enter the number of data: 5
+Enter the value of x: 1 2 3 4 5
+Enter the value of y: 1 4 9 16 25
+Polynomial coefficients :0 0 1 
+
+```
+#### [Back to Contents](#table-of-contents)
 ---
-
-### Transcendental Regression
-
-Supports common transforms:
-- Exponential: \(y = a e^{bx}\)  →  \(\ln y = \ln a + bx\)
-- Power: \(y = a x^b\)          →  \(\ln y = \ln a + b\ln x\)
-
-**File:** `LeastSquares/transcendental_regression.cpp`
-
-```
-#include <bits/stdc++.h>
-using namespace std;
-
-// fitting a linear line
-// y = a + be^(x/4)
-// y = a + bx' = a+bf(x)
-// x' = f(x) = e^(x/4)
-
-pair<double, double> linear_reg(vector<double> vx, vector<double> vy)
-{
-    double n = vx.size();
-    double x = 0, xy = 0, y = 0, x2 = 0;
-    for (int i = 0; i < n; i++)
-    {
-        x += exp(vx[i] / 4);
-        y += vy[i];
-        xy += exp(vx[i] / 4) * vy[i];
-        x2 += exp(vx[i] / 4) * exp(vx[i] / 4);
-    }
-    double b = (n * xy - x * y) / (n * x2 - x * x);
-    double a = (y - b * x) / n;
-    return {b, a};
-}
-
-int main()
-{
-    int n;
-    cout << "Enter the no of points: ";
-    cin >> n;
-    vector<double> vx(n), vy(n);
-    cout << "Enter values of x: " << endl;
-    for (int i = 0; i < n; i++)
-    {
-        cin >> vx[i];
-        cin >> vy[i];
-    }
-
-    auto [b, a] = linear_reg(vx, vy);
-    cout << "y = " << a << " + " << b << "e^(x/4)" << endl;
-    cout << "Enter any value of x: ";
-    double x;
-    cin >> x;
-    cout << "y(" << x << ") = " << a + b * exp(x / 4) << endl;
-}
-
-```
-
----
-
 ## Runge Kutta
 
 **Goal:** Solve \(y' = f(x,y)\) using RK4.  
