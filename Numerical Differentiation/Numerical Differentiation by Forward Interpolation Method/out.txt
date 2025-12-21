@@ -1,0 +1,9 @@
+Total Test Cases: 1
+
+TEST CASE #1
+Numerical g'(x)  = 7.534179
+Exact g'(x)      = 7.534180
+Numerical g''(x) = 9.153914
+Exact g''(x)     = 9.145429
+Error in g'(x)   = 0.000022%
+Error in g''(x)  = 0.092775%
