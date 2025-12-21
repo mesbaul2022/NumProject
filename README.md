@@ -4,6 +4,10 @@ Numerical Methods Laboratory implementations in **C++**: solution of linear equa
 
 ---
 
+##Project Overview:
+- [Overview](overview)
+---
+
 ## Index
 - [Solution of Linear Equations](#solution-of-linear-equations)
   - [Gauss Elimination](#gauss-elimination)
