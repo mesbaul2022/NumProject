@@ -1,0 +1,5 @@
+Enter the degree: 2
+Enter the number of data: 5
+Enter the value of x: 1 2 3 4 5
+Enter the value of y: 1 4 9 16 25
+Polynomial coefficients :0 0 1 
