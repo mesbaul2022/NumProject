@@ -1,0 +1,9 @@
+Case 1:
+Unique Solution:
+5 3 -2
+
+Case 2:
+No Solution
+
+Case 3:
+Infinite Solutions
