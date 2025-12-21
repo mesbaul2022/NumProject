@@ -305,37 +305,61 @@ int main(){
 **File:** `NonLinear/bisection.cpp`
 
 ```
-#include <bits/stdc++.h>
+#include<bits/stdc++.h>
 using namespace std;
+int degree;
+vector<double>coeff(degree+1);
+ double f(double x){
+        double val=0;
+     double d=degree;
+     int n=coeff.size();
+     for(int i=0;i<n;i++){
+           //  cout<<degree<<endl;
+        double t=coeff[i]*(pow(x,d));
+        val+=t;
+        d--;
+     }
 
-double f(double x){
-    // Example: x^3 - x - 2 = 0
-    return x*x*x - x - 2;
-}
-
+   return val;
+ }
 int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
 
-    double a,b,eps; int maxIter;
-    cin >> a >> b >> eps >> maxIter;
-
-    if(f(a)*f(b) > 0){
-        cout << "Invalid bracket: f(a) and f(b) must have opposite signs.\n";
-        return 0;
+    cout<<"please1 enter the degree of polynomial equation :";
+    cin>>degree;
+ coeff.resize(degree + 1);
+    cout<<"please enter the coefficient of polynomial :";
+    for(int i=0;i<degree+1;i++)cin>>coeff[i];
+    double xmax=sqrt((coeff[1]/coeff[0])*(coeff[1]/coeff[0])-2*(coeff[2]/coeff[0]));
+  double a,b,c,root=0;
+  for(double i=-xmax;i<=xmax;i+=0.5){
+        a=i;
+      b=i+0.5;
+        double fa=f(a),fb=f(b);
+   // cout<<a<<" "<<b<<" "<<fa*fb<<endl;
+    if(fa*fb<0){
+       double it=0;
+       root++;
+   double e=0.0001;
+  do{
+        it++;
+    //cout<<"ok"<<endl;
+    c= (a+b)/2.0;
+   // cout<<"a="<<a<<" f(a)="<<f(a)<<" b="<<b<<" f(b)="<<f(b)<<" c="<<c<<" f(c)="<<f(c)<<endl;
+    if(fabs(c)<=e) break;
+    if(f(c)*f(a)<0)b=c;
+    else a=c;
+  }while(fabs(f(c))> e && fabs(b-a)>e);
+   cout<<"the root "<< root<<" is: "<<c<<endl;
+    cout<<"search interval ["<<i<<","<<i+0.5<<"]"<<endl;
+    cout<<"iteration is:"<<it<<endl<<endl;
     }
+  }
 
-    double c=a;
-    for(int i=1;i<=maxIter;i++){
-        c = (a+b)/2.0;
-        if (fabs(f(c)) < eps || fabs(b-a) < eps) break;
-        if (f(a)*f(c) < 0) b=c;
-        else a=c;
-    }
-    cout.setf(std::ios::fixed); cout<<setprecision(10);
-    cout << "Root ~ " << c << "\n";
-    return 0;
+
+
+
 }
+
 ```
 
 ---
