@@ -2552,3 +2552,427 @@ y(2)= 1.10364
 ```
 #### [Back to Contents](#table-of-contents)
 ---
+
+
+
+## Numerical Differentiation
+
+### Numerical Differentiation By Forward Interpolation Method
+
+#### Numerical Differentiation By Forward Interpolation Theory
+#### Method used
+**Numerical Differentiation using Forward Interpolation**
+
+#### Objective
+To approximate derivatives f'(x), f''(x), ... from tabulated values of f(x) when an explicit analytic form is not available.
+
+#### Data Requirement
+- Tabulated values (xᵢ, yᵢ) with equal spacing: h = xᵢ₊₁ - xᵢ
+
+#### Basic Idea
+1. Construct an interpolating polynomial for f(x) using either:
+   - Newton's forward interpolation (when differentiating near the beginning of the table), or
+   - Newton's backward interpolation (when differentiating near the end of the table).
+2. Differentiate the interpolating polynomial analytically and then evaluate the derivative at the required point.
+
+#### Example: First Derivative – Forward Formula at x₀
+Using the Newton forward polynomial and differentiating, one obtains a formula of the form
+```
+f'(x₀) ≈ (1/h)(a₁Δy₀ + a₂Δ²y₀ + a₃Δ³y₀ + ⋯)
+```
+where Δᵏy₀ are forward differences and aₖ are known constants depending on the chosen order of approximation.
+
+
+
+#### Second Derivative Approximation
+By differentiating the interpolating polynomial twice, we obtain formulas for the second derivative.
+
+- **At the beginning of the table (forward / using forward differences):**
+    ```
+    f''(x₀) ≈ Δ²y₀/h² = (y₂ - 2y₁ + y₀)/h²
+    ```
+
+Higher-order formulas (involving more difference terms) can be derived in the same way when greater accuracy is required.
+
+#### Interpolation Formulas Used
+For reference, the interpolation polynomials used in numerical differentiation are:
+
+- **Forward interpolation (around x₀):**
+    ```
+    f(x) ≈ y₀ + uΔy₀ + [u(u-1)/2!]Δ²y₀ + [u(u-1)(u-2)/3!]Δ³y₀ + ⋯
+    ```
+    where u = (x - x₀)/h
+
+
+
+#### Features
+- Allows estimation of derivatives using only function values.
+- Accuracy depends on the step size h and smoothness of f(x)
+
+#### Numerical Differentiation By Forward Interpolation Code
+```cpp
+#include<bits/stdc++.h>
+using namespace std;
+
+long long fact(int n)
+{
+    if(n == 0 || n == 1) return 1;
+    return n * fact(n - 1);
+}
+
+double g(double x)
+{
+    return exp(x) + x*x*x + sin(x);
+}
+
+double g_prime(double x)
+{
+    return exp(x) + 3*x*x + cos(x);
+}
+
+double g_double_prime(double x)
+{
+    return exp(x) + 6*x - sin(x);
+}
+
+vector<vector<double>> buildDiffTable(vector<double>& values)
+{
+    int sz = values.size();
+    vector<vector<double>> table(sz, vector<double>(sz, 0.0));
+
+    for(int i = 0; i < sz; i++)
+        table[i][0] = values[i];
+
+    for(int j = 1; j < sz; j++)
+        for(int i = 0; i < sz - j; i++)
+            table[i][j] = table[i + 1][j - 1] - table[i][j - 1];
+
+    return table;
+}
+
+void process(int caseNo, ifstream& fin, ofstream& fout)
+{
+    int intervalCount;
+    fin >> intervalCount;
+
+    double startPoint, endPoint;
+    fin >> startPoint >> endPoint;
+
+    double evalPoint;
+    fin >> evalPoint;
+
+    double step = (endPoint - startPoint) / intervalCount;
+
+    vector<double> grid(intervalCount), funcValues(intervalCount);
+    for(int i = 0; i < intervalCount; i++)
+    {
+        grid[i] = startPoint + i * step;
+        funcValues[i] = g(grid[i]);
+    }
+
+    vector<vector<double>> diff = buildDiffTable(funcValues);
+
+    double u = (evalPoint - grid[0]) / step;
+
+    double approxFirst =
+        ( diff[0][1]
+        + (2*u - 1) * diff[0][2] / fact(2)
+        + (3*u*u - 6*u + 2) * diff[0][3] / fact(3)
+        ) / step;
+
+    double approxSecond =
+        ( diff[0][2]
+        + (u - 1) * diff[0][3]
+        ) / (step * step);
+
+    double exactFirst = g_prime(evalPoint);
+    double exactSecond = g_double_prime(evalPoint);
+
+    double errorFirst = fabs((exactFirst - approxFirst) / exactFirst) * 100.0;
+    double errorSecond = fabs((exactSecond - approxSecond) / exactSecond) * 100.0;
+
+    cout << "\nTEST CASE #" << caseNo << "\n";
+    cout << "Difference Table:\n";
+    for(int i = 0; i < intervalCount; i++)
+    {
+        for(int j = 0; j < intervalCount; j++)
+            cout << setw(12) << diff[i][j];
+        cout << "\n";
+    }
+
+    cout << fixed << setprecision(6);
+    cout << "Numerical g'(x)  = " << approxFirst << "\n";
+    cout << "Exact g'(x)      = " << exactFirst << "\n";
+    cout << "Numerical g''(x) = " << approxSecond << "\n";
+    cout << "Exact g''(x)     = " << exactSecond << "\n";
+    cout << "Error in g'(x)   = " << errorFirst << "%\n";
+    cout << "Error in g''(x)  = " << errorSecond << "%\n";
+
+    fout << "\nTEST CASE #" << caseNo << "\n";
+    fout << fixed << setprecision(6);
+    fout << "Numerical g'(x)  = " << approxFirst << "\n";
+    fout << "Exact g'(x)      = " << exactFirst << "\n";
+    fout << "Numerical g''(x) = " << approxSecond << "\n";
+    fout << "Exact g''(x)     = " << exactSecond << "\n";
+    fout << "Error in g'(x)   = " << errorFirst << "%\n";
+    fout << "Error in g''(x)  = " << errorSecond << "%\n";
+}
+
+int main()
+{
+
+
+    ifstream fin("input.txt");
+    ofstream fout("output.txt");
+
+
+
+    int totalCases;
+    fin >> totalCases;
+
+    cout << "Total Test Cases: " << totalCases << "\n";
+    fout << "Total Test Cases: " << totalCases << "\n";
+
+    for(int i = 1; i <= totalCases; i++)
+        process(i, fin, fout);
+
+    fin.close();
+    fout.close();
+
+
+    return 0;
+}
+
+```
+
+#### Numerical Differentiation By Forward Interpolation Input
+```
+1
+6
+1.0 1.6
+1.15
+
+```
+
+#### Numerical Differentiation By Forward Interpolation Output
+```
+Total Test Cases: 1
+
+TEST CASE #1
+Numerical g'(x)  = 7.534179
+Exact g'(x)      = 7.534180
+Numerical g''(x) = 9.153914
+Exact g''(x)     = 9.145429
+Error in g'(x)   = 0.000022%
+Error in g''(x)  = 0.092775%
+
+```
+#### [Back to Contents](#table-of-contents)
+---
+
+### Numerical Differentiation By Backward Interpolation Method
+
+#### Numerical Differentiation By Backward Interpolation Theory
+#### Method used
+Numerical Differentiation using Backward Interpolation
+
+#### Objective
+To approximate derivatives f'(x), f''(x), … from tabulated values of f(x) when an explicit analytic expression of the function is not available.
+
+#### Data Requirement
+- Tabulated values (xᵢ, yᵢ) with equal spacing:
+  h = xᵢ − xᵢ₋₁
+
+#### Basic Idea
+1. Construct an interpolating polynomial for f(x) using Newton’s backward interpolation, which is suitable when the required derivative is near the end of the data table.
+2. Differentiate the backward interpolation polynomial analytically and evaluate the derivative at the required point.
+
+#### Example: First Derivative – Backward Formula at xₙ
+By differentiating the Newton backward interpolation polynomial, the first derivative at xₙ can be approximated as
+
+f'(xₙ) ≈ (1/h)(b₁∇yₙ + b₂∇²yₙ + b₃∇³yₙ + ⋯)
+
+where ∇ᵏyₙ are backward differences and bₖ are known constants depending on the order of approximation.
+
+#### Second Derivative Approximation
+Differentiating the backward interpolation polynomial twice yields an expression for the second derivative.
+
+- At the end of the table (backward / using backward differences):
+
+f''(xₙ) ≈ ∇²yₙ/h² = (yₙ − 2yₙ₋₁ + yₙ₋₂)/h²
+
+Higher-order derivative formulas can be obtained by including additional backward difference terms to improve accuracy.
+
+#### Interpolation Formulas Used
+For reference, the backward interpolation polynomial used in numerical differentiation is:
+
+f(x) ≈ yₙ + u∇yₙ + [u(u+1)/2!]∇²yₙ + [u(u+1)(u+2)/3!]∇³yₙ + ⋯
+
+where u = (x − xₙ)/h
+
+#### Features
+- Enables numerical differentiation when only discrete data values are available.
+- Provides better accuracy when the evaluation point is close to the last tabulated value.
+- Accuracy depends on step size h and the smoothness of the underlying function.
+
+
+#### Numerical Differentiation By Backward Interpolation Code
+```cpp
+#include<bits/stdc++.h>
+using namespace std;
+
+long long fact(int n)
+{
+    if(n == 0 || n == 1) return 1;
+    return n * fact(n - 1);
+}
+
+double f(double x)
+{
+    return x*x + sin(x);
+}
+
+double f1(double x)
+{
+    return 2*x + cos(x);
+}
+
+double f2(double x)
+{
+    return 2 - sin(x);
+}
+
+vector<vector<double>> backwardDiffTable(vector<double>& values)
+{
+    int n = values.size();
+    vector<vector<double>> table(n, vector<double>(n, 0.0));
+
+    for(int i = 0; i < n; i++)
+        table[i][0] = values[i];
+
+    for(int j = 1; j < n; j++)
+        for(int i = n - 1; i >= j; i--)
+            table[i][j] = table[i][j - 1] - table[i - 1][j - 1];
+
+    return table;
+}
+
+void solve(int tc, ifstream& fin, ofstream& fout)
+{
+    int n;
+    fin >> n;
+
+    double a, b;
+    fin >> a >> b;
+
+    double X;
+    fin >> X;
+
+    double h = (b - a) / n;
+
+    vector<double> x(n), y(n);
+    for(int i = 0; i < n; i++)
+    {
+        x[i] = a + i * h;
+        y[i] = f(x[i]);
+    }
+
+    vector<vector<double>> diff = backwardDiffTable(y);
+
+    double u = (X - x[n - 1]) / h;
+
+    double dydx =
+        ( diff[n - 1][1]
+        + (2*u + 1) * diff[n - 1][2] / fact(2)
+        + (3*u*u + 6*u + 2) * diff[n - 1][3] / fact(3)
+        ) / h;
+
+    double d2ydx2 =
+        ( diff[n - 1][2]
+        + (u + 1) * diff[n - 1][3]
+        ) / (h * h);
+
+    double exact1 = f1(X);
+    double exact2 = f2(X);
+
+    double error1 = fabs((exact1 - dydx) / exact1) * 100.0;
+    double error2 = fabs((exact2 - d2ydx2) / exact2) * 100.0;
+
+    cout << "\nTEST CASE #" << tc << "\n";
+    cout << "Backward Difference Table:\n";
+    for(int i = 0; i < n; i++)
+    {
+        for(int j = 0; j < n; j++)
+            cout << setw(12) << diff[i][j];
+        cout << "\n";
+    }
+
+    cout << fixed << setprecision(6);
+    cout << "Numerical f'(x)  = " << dydx << "\n";
+    cout << "Exact f'(x)      = " << exact1 << "\n";
+    cout << "Numerical f''(x) = " << d2ydx2 << "\n";
+    cout << "Exact f''(x)     = " << exact2 << "\n";
+    cout << "Error in f'(x)   = " << error1 << "%\n";
+    cout << "Error in f''(x)  = " << error2 << "%\n";
+
+    fout << "\nTEST CASE #" << tc << "\n";
+    fout << fixed << setprecision(6);
+    fout << "Numerical f'(x)  = " << dydx << "\n";
+    fout << "Exact f'(x)      = " << exact1 << "\n";
+    fout << "Numerical f''(x) = " << d2ydx2 << "\n";
+    fout << "Exact f''(x)     = " << exact2 << "\n";
+    fout << "Error in f'(x)   = " << error1 << "%\n";
+    fout << "Error in f''(x)  = " << error2 << "%\n";
+}
+
+int main()
+{
+
+
+    ifstream fin("input.txt");
+    ofstream fout("output.txt");
+
+
+
+    int t;
+    fin >> t;
+
+    cout << "Total Test Cases: " << t << "\n";
+    fout << "Total Test Cases: " << t << "\n";
+
+    for(int i = 1; i <= t; i++)
+        solve(i, fin, fout);
+
+    fin.close();
+    fout.close();
+
+
+    return 0;
+}
+
+```
+
+#### Numerical Differentiation By Backward Interpolation Input
+```
+1
+6
+1.0 1.6
+1.15
+
+```
+
+#### Numerical Differentiation By Backward Interpolation Output
+```
+Total Test Cases: 1
+
+TEST CASE #1
+Numerical f'(x)  = 2.709370
+Exact f'(x)      = 2.708487
+Numerical f''(x) = 1.070054
+Exact f''(x)     = 1.087236
+Error in f'(x)   = 0.032598%
+Error in f''(x)  = 1.580300%
+
+```
+#### [Back to Contents](#table-of-contents)
+---
