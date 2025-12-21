@@ -1,0 +1,4 @@
+Enter the value of a b n
+0 1 4
+result
+1.67157
