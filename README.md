@@ -29,24 +29,6 @@ Numerical Methods Laboratory implementations in **C++**: solution of linear equa
   - [Transcendental Regression](#transcendental-regression)
 - [Runge Kutta](#runge-kutta)
 
----
-
-## How to run
-
-### Compile
-```
-g++ -std=c++17 -O2 -o app filename.cpp
-```
-
-### Run
-```
-./app
-```
-
-> Tip: Each section below suggests a file path. Create files accordingly (recommended).
-
----
-
 ## Solution of Linear Equations
 
 ### Gauss Elimination
