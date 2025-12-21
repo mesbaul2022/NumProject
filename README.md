@@ -790,35 +790,36 @@ int main()
 #include <bits/stdc++.h>
 using namespace std;
 
-double f(double x){
-    return 1.0/(1.0+x*x); // example
+// Function to integrate
+float func(float x) {
+    float s = sin(x);
+    return pow(s, 5) + 4 * pow(s, 4) + 1;
 }
 
-int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-
-    double a,b; int n;
+int main() {
+    float a, b;
+    int n;
+    cout << "Enter the values of a, b and n (n must be divisible by 3): ";
     cin >> a >> b >> n;
-    if(n%3!=0){
-        cout << "n must be multiple of 3.\n";
-        return 0;
+    float h = (b - a) / n;
+    float sum = func(a) + func(b);
+
+    for (int i = 1; i < n; i++) {
+        float x = a + i * h;
+        if (i % 3 == 0) {
+            sum += 2 * func(x);
+        } else {
+            sum += 3 * func(x);
+        }
     }
 
-    double h = (b-a)/n;
-    double sum = f(a) + f(b);
+    float result = (3 * h / 8) * sum;
+    cout << fixed << setprecision(6);
+    cout << "Integral result = " << result << endl;
 
-    for(int i=1;i<n;i++){
-        double x = a + i*h;
-        sum += (i%3==0 ? 2.0 : 3.0) * f(x);
-    }
-
-    double ans = (3.0*h/8.0)*sum;
-
-    cout.setf(std::ios::fixed); cout<<setprecision(10);
-    cout << "Integral ~ " << ans << "\n";
     return 0;
 }
+
 ```
 
 ---
