@@ -1,0 +1,16 @@
+equation  1X^4-5X^2+4=0
+interval is (-2.51228,-1.86228)
+root 1 is: -2
+iteration number:5
+
+interval is (-1.21228,-0.562278)
+root 2 is: -1
+iteration number:4
+
+interval is (0.737722,1.38772)
+root 3 is: 1
+iteration number:4
+
+ interval is (1.38772,2.03772)
+root 4 is: 2
+iteration number:3

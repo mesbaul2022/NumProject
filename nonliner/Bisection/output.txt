@@ -1,0 +1,8 @@
+Value :-2
+Number of itretion :19
+Value :-0.999999
+Number of itretion :19
+Value :1
+Number of itretion :19
+Value :2
+Number of itretion :19

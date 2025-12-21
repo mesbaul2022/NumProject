@@ -1,0 +1,8 @@
+Value :-2
+Number of itretion :11
+Value :-1
+Number of itretion :3
+Value :1
+Number of itretion :4
+Value :2
+Number of itretion :16

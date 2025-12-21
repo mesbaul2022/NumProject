@@ -1,0 +1,8 @@
+The range for root 1: -2.50--->-1.85
+Root 1 :-2.00002
+The range for root 2: -1.55002--->-0.65002
+Root 2 :-0.999998
+The range for root 3: -0.549998--->1.25
+Root 3 :1
+The range for root 4: 1.45--->2.35
+Root 4 :2
