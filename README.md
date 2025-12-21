@@ -1699,47 +1699,127 @@ The final result 42.875
 ```
 #### [Back to Contents](#table-of-contents)
 ---
-### Divided Difference
 
-**File:** `Interpolation/divided_difference.cpp`  
-**Note:** Works for non-equally spaced points.
+### Divided Difference Method
 
-```
+#### Divided Difference Theory
+#### Method used
+Newton's Divided Difference Interpolation
+
+#### Objective
+To construct interpolating polynomials for unequally spaced data points.
+Works with both equal and unequal spacing.
+
+#### DIVIDED DIFFERENCES FORMULA
+
+First-order divided difference
+
+f[xᵢ, xᵢ₊₁] = [ f(xᵢ₊₁) − f(xᵢ) ] / (xᵢ₊₁ − xᵢ)
+
+Higher-order divided differences (recursive)
+
+f[xᵢ, xᵢ₊₁, … , xᵢ₊ₖ]
+= [ f[xᵢ₊₁, … , xᵢ₊ₖ] − f[xᵢ, … , xᵢ₊ₖ₋₁] ] / (xᵢ₊ₖ − xᵢ)
+
+#### NEWTON DIVIDED DIFFERENCE POLYNOMIAL
+
+Pₙ(x) = f[x₀]
+       + (x − x₀) f[x₀, x₁]
+       + (x − x₀)(x − x₁) f[x₀, x₁, x₂]
+       + ...
+       + (x − x₀)(x − x₁)...(x − xₙ₋₁) f[x₀, ..., xₙ]
+
+#### Data Requirement
+- Distinct data points (x₀, y₀), (x₁, y₁), ..., (xₙ, yₙ)
+- Works with equal or unequal spacing
+
+#### Features
+- Works for both equally and unequally spaced nodes.
+- Coefficients can be updated easily when new data points are added.
+- Numerically stable when nodes are distinct and well separated.
+
+#### Divided Difference Code
+```cpp
 #include <bits/stdc++.h>
 using namespace std;
 
-int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-
-    int n; cin >> n;
-    vector<double> x(n);
-    vector<vector<double>> dd(n, vector<double>(n,0.0));
-
-    for(int i=0;i<n;i++){
-        cin >> x[i] >> dd[i];
+int main()
+{
+    int n;
+    cout << "Enter the number of value : ";
+    cin >> n;
+    cout << "Enter the value of x and y :" << endl;
+    vector<double> x(n), y(n);
+    for (int i = 0; i < n; i++)
+    {
+        cin >> x[i] >> y[i];
     }
-    double xp; cin >> xp;
+    double value;
+    cout << "Enter the value of x : ";
+    cin >> value;
 
-    for(int j=1;j<n;j++){
-        for(int i=0;i<n-j;i++){
-            dd[i][j] = (dd[i+1][j-1]-dd[i][j-1])/(x[i+j]-x[i]);
+    vector<vector<double>> table(n, vector<double>(n, 0));
+
+    for (int i = 0; i < n; i++)
+    {
+         table[i][0] = y[i];
+    }
+    
+    for (int j = 1; j < n; j++)
+    {
+        for (int i = 0; i < n - j; i++)
+        {
+            table[i][j] = (table[i + 1][j - 1] - table[i][j - 1]) / (x[i + j] - x[i]);
         }
     }
 
-    double yp = dd;
-    double term = 1.0;
-    for(int j=1;j<n;j++){
-        term *= (xp - x[j-1]);
-        yp += term * dd[j];
+    cout << "Divided Difference Table :" << endl;
+    for (int j = 0; j < n; j++)
+    {
+        for (int i = 0; i < n - j; i++)
+        {
+            cout << setw(10) << table[i][j] << " ";
+        }
+        cout << endl;
     }
 
-    cout.setf(std::ios::fixed); cout<<setprecision(10);
-    cout << "y("<<xp<<") ~ " << yp << "\n";
+    double res = y[0], term = 1.0;
+    for (int i = 1; i < n; i++)
+    {
+        term *= (value - x[i - 1]);
+        res += term * table[0][i];
+    }
+
+    cout << "Result = " << res << endl;
     return 0;
 }
+
 ```
 
+#### Divided Difference Input
+```
+5
+1 1
+2 8
+3 27
+4 64
+5 125
+3.5
+
+
+```
+
+#### Divided Difference Output
+```
+Divided Difference Table :
+         1          8         27         64        125
+         7         19         37         61
+         6          9         12
+         1          1
+         0
+Result = 42.875
+```
+#### [Back to Contents](#table-of-contents)
 ---
 
 ## Numerical Integration
