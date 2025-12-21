@@ -1,0 +1,7 @@
+Divided Difference Table :
+         1          8         27         64        125
+         7         19         37         61
+         6          9         12
+         1          1
+         0
+Result = 42.875
