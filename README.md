@@ -9,7 +9,7 @@
 ## Table of Contents
 
 - [Solution of Linear Equations](#solution-of-linear-equations)
-  - [Gauss Elimination Method](#gauss-elimination)
+  - [Gauss Elimination Method](#gauss-elimination-method)
     - [Theory](#gauss-elimination-theory)
     - [Code](#gauss-elimination-code)
     - [Input](#gauss-elimination-input)
@@ -19,7 +19,7 @@
     - [Code](#gauss-jordan-code)
     - [Input](#gauss-jordan-input)
     - [Output](#gauss-jordan-output)
-  - [LU Decomposition Method](#lu-decomposition)
+  - [LU Decomposition Method](#lu-decomposition-method)
     - [Theory](#lu-decomposition-theory)
     - [Code](#lu-decomposition-code)
     - [Input](#lu-decomposition-input)
@@ -123,7 +123,7 @@
 
 ## Solution of Linear Equations
 
-### Gauss Elimination
+# gauss-elimination-method
 
 #### Gauss Elimination Theory
 
