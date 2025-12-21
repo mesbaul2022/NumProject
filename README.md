@@ -108,12 +108,12 @@ Numerical Methods Laboratory implementations in **C++**: solution of linear equa
     - [Output](#numerical-differentiation-by-backward-interpolation-output)
 
 - [Solution of Numerical Integrations](#solution-of-numerical-integrations)
-  - [Simpson's One-Third Rule](#simpson-13)
+  - [Simpson's One-Third Rule](#simpsons-one-third-rule)
     - [Theory](#simpsons-one-third-rule-theory)
     - [Code](#simpsons-one-third-rule-code)
     - [Input](#simpsons-one-third-rule-input)
     - [Output](#simpsons-one-third-rule-output)
-  - [Simpson's Three-Eighths Rule](#simpson-38)
+  - [Simpson's Three-Eighths Rule](#simpsons-three-eighths-rule)
     - [Theory](#simpsons-three-eighths-rule-theory)
     - [Code](#simpsons-three-eighths-rule-code)
     - [Input](#simpsons-three-eighths-rule-input)
@@ -1722,6 +1722,33 @@ Divides the interval into an even number of subintervals and fits parabolas thro
 ```
 where h = (b-a)/n
 
+## Solution of Numerical Integrations
+
+### Simpson's One-Third Rule
+
+#### Simpson's One-Third Rule Theory
+#### Objective
+To approximate the definite integral of a function using parabolic interpolation.
+
+#### Data Requirement
+A polynomial equation of `n` degree:
+
+  - aₙxⁿ + aₙ₋₁xⁿ⁻¹ + … + a₂x² + a₁x + a₀ = 0
+
+Integration limits: `[a, b]` and number of subintervals `n` (must be even)
+
+#### Core Idea
+Fit a parabola → to approximate the curve   
+Integrate the parabola → to approximate the area
+
+Divides the interval into an even number of subintervals and fits parabolas through groups of three consecutive points. Once a parabola is fitted through three points, that parabola can be integrated exactly using basic calculus.
+**Formula:**
+```
+∫ₐᵇ f(x)dx ≈ (h/3)[f(x₀) + 4Σf(xᵢ) + 2Σf(xᵢ) + f(xₙ)]
+              (i=odd)    (i=even)
+```
+where h = (b-a)/n
+
 #### Simpson's One-Third Rule Code
 ```cpp
 #include<bits/stdc++.h>
@@ -1754,8 +1781,6 @@ int main()
     cout<<(sum*h)/3<<endl;
 
 }
-```
-
 ```
 
 #### Simpson's One-Third Rule Input
@@ -1843,10 +1868,12 @@ int main() {
 Equation: 1*x^4 + 0*x^3 + 0*x^2 + 1*x^1 + 1*x^0
 Simpson 3/8 Rule Result = 56.1562
 ```
-
-
-
+#### [Back to Contents](#table-of-contents)
 ---
+## Download PDF
+
+- Download this README as a PDF for offline viewing: [README.pdf](README.pdf)
+
 
 ## Numerical Differentiation
 
