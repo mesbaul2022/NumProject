@@ -1020,65 +1020,48 @@ Supports common transforms:
 #include <bits/stdc++.h>
 using namespace std;
 
-int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+// fitting a linear line
+// y = a + be^(x/4)
+// y = a + bx' = a+bf(x)
+// x' = f(x) = e^(x/4)
 
-    int n; cin >> n;
-    int mode; 
-    // 1 = exponential (y = a e^(b x))
-    // 2 = power       (y = a x^b)
-    cin >> mode;
-
-    vector<double> X(n), Y(n);
-    for(int i=0;i<n;i++) cin >> X[i] >> Y[i];
-
-    vector<double> u(n), v(n);
-    for(int i=0;i<n;i++){
-        if (Y[i] <= 0){
-            cout << "All y must be > 0 for log transform.\n";
-            return 0;
-        }
-        if (mode==1){
-            u[i] = X[i];
-            v[i] = log(Y[i]);
-        } else if (mode==2){
-            if (X[i] <= 0){
-                cout << "All x must be > 0 for power model.\n";
-                return 0;
-            }
-            u[i] = log(X[i]);
-            v[i] = log(Y[i]);
-        } else {
-            cout << "Invalid mode.\n";
-            return 0;
-        }
+pair<double, double> linear_reg(vector<double> vx, vector<double> vy)
+{
+    double n = vx.size();
+    double x = 0, xy = 0, y = 0, x2 = 0;
+    for (int i = 0; i < n; i++)
+    {
+        x += exp(vx[i] / 4);
+        y += vy[i];
+        xy += exp(vx[i] / 4) * vy[i];
+        x2 += exp(vx[i] / 4) * exp(vx[i] / 4);
     }
-
-    double su=0, sv=0, suu=0, suv=0;
-    for(int i=0;i<n;i++){
-        su += u[i]; sv += v[i];
-        suu += u[i]*u[i];
-        suv += u[i]*v[i];
-    }
-
-    double den = n*suu - su*su;
-    if (fabs(den) < 1e-15){
-        cout << "Cannot fit (denominator near zero).\n";
-        return 0;
-    }
-
-    double b = (n*suv - su*sv)/den;
-    double A = (sv - b*su)/n; // A = ln(a)
-    double a = exp(A);
-
-    cout.setf(std::ios::fixed); cout<<setprecision(10);
-    cout << "a = " << a << "\n";
-    cout << "b = " << b << "\n";
-    if (mode==1) cout << "Fitted: y = a * exp(b*x)\n";
-    if (mode==2) cout << "Fitted: y = a * x^b\n";
-    return 0;
+    double b = (n * xy - x * y) / (n * x2 - x * x);
+    double a = (y - b * x) / n;
+    return {b, a};
 }
+
+int main()
+{
+    int n;
+    cout << "Enter the no of points: ";
+    cin >> n;
+    vector<double> vx(n), vy(n);
+    cout << "Enter values of x: " << endl;
+    for (int i = 0; i < n; i++)
+    {
+        cin >> vx[i];
+        cin >> vy[i];
+    }
+
+    auto [b, a] = linear_reg(vx, vy);
+    cout << "y = " << a << " + " << b << "e^(x/4)" << endl;
+    cout << "Enter any value of x: ";
+    double x;
+    cin >> x;
+    cout << "y(" << x << ") = " << a + b * exp(x / 4) << endl;
+}
+
 ```
 
 ---
