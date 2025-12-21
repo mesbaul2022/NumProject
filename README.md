@@ -835,12 +835,39 @@ int main(){
 
 > Edit `f(x)` inside each file.
 
-### Simpson 1/3
 
-**File:** `Integration/simpson_1_3.cpp`  
-**Note:** `n` must be even.
 
+---
+
+## Solution of Numerical Integrations
+
+### Simpson's One-Third Rule
+
+#### Simpson's One-Third Rule Theory
+#### Objective
+To approximate the definite integral of a function using parabolic interpolation.
+
+#### Data Requirement
+A polynomial equation of `n` degree:
+
+  - aₙxⁿ + aₙ₋₁xⁿ⁻¹ + … + a₂x² + a₁x + a₀ = 0
+
+Integration limits: `[a, b]` and number of subintervals `n` (must be even)
+
+#### Core Idea
+Fit a parabola → to approximate the curve   
+Integrate the parabola → to approximate the area
+
+Divides the interval into an even number of subintervals and fits parabolas through groups of three consecutive points. Once a parabola is fitted through three points, that parabola can be integrated exactly using basic calculus.
+**Formula:**
 ```
+∫ₐᵇ f(x)dx ≈ (h/3)[f(x₀) + 4Σf(xᵢ) + 2Σf(xᵢ) + f(xₙ)]
+              (i=odd)    (i=even)
+```
+where h = (b-a)/n
+
+#### Simpson's One-Third Rule Code
+```cpp
 #include<bits/stdc++.h>
 
 using namespace std;
@@ -873,14 +900,47 @@ int main()
 }
 ```
 
+```
+
+#### Simpson's One-Third Rule Input
+```
+3
+1 2 0 1
+0 1 6
+```
+
+#### Simpson's One-Third Rule Output
+```
+Equation: 1*x^3 + 2*x^2 + 0*x^1 + 1*x^0
+Simpson 1/3 Rule Result = 1.91667
+```
+#### [Back to Contents](#table-of-contents)
 ---
 
-### Simpson 3/8
+### Simpson's Three-Eighths Rule 
 
-**File:** `Integration/simpson_3_8.cpp`  
-**Note:** `n` must be a multiple of 3.
+#### Simpson's Three-Eighths Rule Theory
+#### Objective
+To approximate the definite integral of a function using cubic interpolation.
 
+#### Data Requirement
+A polynomial equation of `n` degree:
+
+  - aₙxⁿ + aₙ₋₁xⁿ⁻¹ + … + a₂x² + a₁x + a₀ = 0
+
+Integration limits: `[a, b]` and number of subintervals `n` (must be multiple of 3)
+
+#### Core Idea
+Divides the interval into subintervals (multiple of 3) and fits cubic polynomials through groups of four consecutive points. Provides higher accuracy for functions with higher-order derivatives.  
+**Formula:**
 ```
+∫ₐᵇ f(x)dx ≈ (3h/8)[f(x₀) + 3Σf(xᵢ) + 2Σf(xᵢ) + f(xₙ)]
+               (i≠3k)      (i=3k)
+```
+where h = (b-a)/n
+
+#### Simpson's Three-Eighths Rule Code
+```cpp
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -913,8 +973,22 @@ int main() {
 
     return 0;
 }
-
 ```
+
+#### Simpson's Three-Eighths Rule Input
+```
+4
+1 0 0 1 1
+0 3 6
+```
+
+#### Simpson's Three-Eighths Rule Output
+```
+Equation: 1*x^4 + 0*x^3 + 0*x^2 + 1*x^1 + 1*x^0
+Simpson 3/8 Rule Result = 56.1562
+```
+
+
 
 ---
 
