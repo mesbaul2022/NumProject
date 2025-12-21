@@ -2005,10 +2005,6 @@ Simpson 3/8 Rule Result = 56.1562
 ```
 #### [Back to Contents](#table-of-contents)
 ---
-## Download PDF
-
-- Download this README as a PDF for offline viewing: [README.pdf](README.pdf)
-
 
 ## Numerical Differentiation
 
