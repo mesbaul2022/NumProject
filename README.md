@@ -54,7 +54,7 @@ Numerical Methods Laboratory implementations in **C++**: solution of linear equa
     - [Input](#newton-raphson-input)
     - [Output](#newton-raphson-output)
 
-- [Solution of Interpolation](#interpolation)
+- [Solution of Interpolation](#solution-of-interpolation)
   - [Newton's Forward Interpolation Method](#newtons-forward-interpolation-method)
     - [Theory](#newtons-forward-interpolation-theory)
     - [Code](#newtons-forward-interpolation-code)
@@ -1574,94 +1574,255 @@ iteration number:3
 ```
 #### [Back to Contents](#table-of-contents)
 ---
-## Interpolation
+## Solution of Interpolation
 
-### Newton Forward
+### Newton's Forward Interpolation Method
 
-**File:** `Interpolation/newton_forward.cpp`  
-**Note:** Requires equally spaced `x`.
+#### Newton's Forward Interpolation Theory
+#### Method used
+Newton's Forward Difference Interpolation
 
-```
+#### Objective
+To approximate function values at intermediate points using forward differences.
+Supports multiple data points with automatic polynomial order detection.
+
+#### NEWTON FORWARD INTERPOLATION FORMULA
+
+f(x) = f(x₀)
+     + uΔf(x₀)
+     + [u(u−1)/2!] Δ²f(x₀)
+     + [u(u−1)(u−2)/3!] Δ³f(x₀)
+     + ...
+
+where
+
+u = (x − x₀) / h  
+h = step size (x₁ − x₀)  
+Δⁿf(x₀) = nth forward difference at x₀  
+
+#### FORWARD DIFFERENCE TABLE
+
+Δf(xᵢ)   = f(xᵢ₊₁) − f(xᵢ)  
+Δ²f(xᵢ)  = Δf(xᵢ₊₁) − Δf(xᵢ)  
+Δⁿf(xᵢ)  = Δⁿ⁻¹f(xᵢ₊₁) − Δⁿ⁻¹f(xᵢ)  
+
+#### Data Requirement
+- Tabulated values (x₀, y₀), (x₁, y₁), ..., (xₙ, yₙ)
+- Equal spacing between x values
+
+#### Features
+- Best suited for interpolation near the beginning of the data table.
+- Requires equally spaced x values.
+
+
+#### Newton's Forward Interpolation Code
+```cpp
 #include <bits/stdc++.h>
 using namespace std;
-
-int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-
-    int n; cin >> n;
-    vector<double> x(n), y(n);
-    for(int i=0;i<n;i++) cin >> x[i] >> y[i];
-    double xp; cin >> xp;
-
-    vector<vector<double>> diff(n, vector<double>(n,0.0));
-    for(int i=0;i<n;i++) diff[i]=y[i];
-    for(int j=1;j<n;j++)
-        for(int i=0;i<n-j;i++)
-            diff[i][j]=diff[i+1][j-1]-diff[i][j-1];
-
-    double h = x-x;[3]
-    double u = (xp - x)/h;
-
-    double yp = diff;
-    double uterm = 1.0, fact = 1.0;
-    for(int j=1;j<n;j++){
-        uterm *= (u-(j-1));
-        fact *= j;
-        yp += (uterm/fact)*diff[j];
-    }
-
-    cout.setf(std::ios::fixed); cout<<setprecision(10);
-    cout << "y("<<xp<<") ~ " << yp << "\n";
-    return 0;
+int fact(int x)
+{
+  if (x == 0)
+    return 1;
+  else
+    return x * fact(x - 1);
 }
+int main()
+{
+  cout << "Enter the N ";
+  int n;
+  cin >> n;
+  vector<double> x(n), y(n);
+  cout << "Enter x1-x2 and y:" << endl;
+  double sum = 0;
+  for (int i = 0; i < n; i++)
+  {
+    int x1, x2, y1;
+    cin >> x1 >> x2 >> y1;
+    x[i] = x2;
+    y[i] = sum + y1;
+    sum += y1;
+  }
+  cout << "Enter the range  to find x1-x2 :";
+  int init, final;
+  cin >> init >> final;
+
+  vector<vector<double>> dif(n, vector<double>(n, 0));
+  for (int i = 0; i < n; i++)
+  {
+    dif[i][0] = y[i];
+  }
+  for (int j = 1; j < n; j++)
+  {
+    for (int i = 0; i < n - j; i++)
+    {
+      dif[i][j] = dif[i + 1][j - 1] - dif[i][j - 1];
+    }
+  }
+  double h = x[1] - x[0];
+  double u = (final - x[0]) / h;
+  double result = y[0];
+  double temp = 1.0;
+  for (int i = 1; i < n; i++)
+  {
+    temp = temp * (u - i + 1);
+    result += (temp * dif[0][i]) / fact(i);
+  }
+  cout << "value of Y at " << init << "-" << final << " : " << result << endl;
+  return 0;
+}
+
+
 ```
 
+#### Newton's Forward Interpolation Input
+```
+4
+0 1 1
+1 2 3
+2 3 5
+3 4 7
+0 2.5
+
+```
+
+#### Newton's Forward Interpolation Output
+```
+the value of Y at 0-2 : 4
+
+```
+#### [Back to Contents](#table-of-contents)
 ---
 
-### Newton Backward
+### Newton's Backward Interpolation Method
 
-**File:** `Interpolation/newton_backward.cpp`  
-**Note:** Requires equally spaced `x`.
+#### Newton's Backward Interpolation Theory
+#### Method used
+Newton's Backward Difference Interpolation
 
-```
-#include <bits/stdc++.h>
+#### Objective
+To approximate function values at intermediate points using backward differences.
+Ideal when interpolating near the end of the data table.
+
+#### NEWTON BACKWARD INTERPOLATION FORMULA
+
+f(x) = f(xₙ)
+     + u∇f(xₙ)
+     + [u(u+1)/2!] ∇²f(xₙ)
+     + [u(u+1)(u+2)/3!] ∇³f(xₙ)
+     + ...
+
+where
+
+u = (x − xₙ) / h  
+h = step size (x₁ − x₀)  
+∇ⁿf(xₙ) = nth backward difference at xₙ  
+
+#### BACKWARD DIFFERENCE TABLE
+
+∇f(xᵢ)   = f(xᵢ) − f(xᵢ₋₁)  
+∇²f(xᵢ)  = ∇f(xᵢ) − ∇f(xᵢ₋₁)  
+∇ⁿf(xᵢ)  = ∇ⁿ⁻¹f(xᵢ) − ∇ⁿ⁻¹f(xᵢ₋₁)  
+
+#### Data Requirement
+- Tabulated values (x₀, y₀), (x₁, y₁), ..., (xₙ, yₙ)
+- Equal spacing between x values
+
+#### Features
+- Best suited for interpolation near the end of the data table.
+- Requires equally spaced x values.
+- Particularly useful when new data points are appended at the end.
+
+
+#### Newton's Backward Interpolation Code
+```cpp
+#include<bits/stdc++.h>
 using namespace std;
+int fact(int n)
+{
+    if(n==1 || n==0)
+    {
+        return 1;
+    }
+    return n*fact(n-1);
+}
 
-int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+int main()
+{
+    int n;
+    cout<<"Enter the n :";
+    cin>>n;
+    vector<double>X(n);
+    vector<vector<double>>Y(n,vector<double>(n,0.0));
+    for(int i=0;i<n;i++)
+    {
+        cin>>X[i];
+    }
+    cout<<"Enter the Y "<<endl;
+     for(int i=0;i<n;i++)
+    {
+        cin>>Y[i][0];
+    }
 
-    int n; cin >> n;
-    vector<double> x(n), y(n);
-    for(int i=0;i<n;i++) cin >> x[i] >> y[i];
-    double xp; cin >> xp;
+    cout<<"TABLE"<<endl;
 
-    vector<vector<double>> diff(n, vector<double>(n,0.0));
-    for(int i=0;i<n;i++) diff[i]=y[i];
     for(int j=1;j<n;j++)
+    {
         for(int i=n-1;i>=j;i--)
-            diff[i][j]=diff[i][j-1]-diff[i-1][j-1];
-
-    double h = x-x;[3]
-    double u = (xp - x[n-1])/h;
-
-    double yp = diff[n-1];
-    double uterm = 1.0, fact = 1.0;
-    for(int j=1;j<n;j++){
-        uterm *= (u+(j-1));
-        fact *= j;
-        yp += (uterm/fact)*diff[n-1][j];
+        {
+           Y[i][j]=Y[i][j-1]-Y[i-1][j-1];
+        }
     }
 
-    cout.setf(std::ios::fixed); cout<<setprecision(10);
-    cout << "y("<<xp<<") ~ " << yp << "\n";
+    for(int i=0;i<n;i++)
+    {
+        cout<<X[i]<<"\t";
+        for(int k=0;k<=i;k++)
+        {
+           cout<<Y[i][k]<<"\t";
+        }
+        cout<<endl;
+    }
+
+    double h=X[1]-X[0];
+    double value;
+    cout<<"Enter the value : ";
+    cin>>value;
+    double v=(value - X[n-1])/h;
+    double result=Y[n-1][0];
+    double t=1.0;
+    for(int i=1;i<n;i++)
+    {
+           t*=(v+(i-1));
+           result+=(t*Y[n-1][i])/fact(i);
+    }
+    cout<<"The final result "<<result<<endl;
     return 0;
 }
+
 ```
 
----
+#### Newton's Backward Interpolation Input
+```
+4
+1 2 3 4
+1 8 27 64
 
+```
+
+#### Newton's Backward Interpolation Output
+```
+TABLE
+1       1
+2       8       7
+3       27      19      12
+4       64      37      18      6
+
+The final result 42.875
+
+
+```
+#### [Back to Contents](#table-of-contents)
+---
 ### Divided Difference
 
 **File:** `Interpolation/divided_difference.cpp`  
