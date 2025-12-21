@@ -369,40 +369,63 @@ int main(){
 **File:** `NonLinear/false_position.cpp`
 
 ```
-#include <bits/stdc++.h>
+#include<bits/stdc++.h>
 using namespace std;
+int degree;
+vector<double>coeff(degree+1);
+ double f(double x){
+        double val=0;
+     double d=degree;
+     int n=coeff.size();
+     for(int i=0;i<n;i++){
+           //  cout<<degree<<endl;
+        double t=coeff[i]*(pow(x,d));
+        val+=t;
+        d--;
+     }
 
-double f(double x){
-    return x*x*x - x - 2;
-}
-
+   return val;
+ }
 int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
 
-    double a,b,eps; int maxIter;
-    cin >> a >> b >> eps >> maxIter;
+    cout<<"please enter the degree of polynomial equation :";
+    cin>>degree;
+ coeff.resize(degree + 1);
+    cout<<"please enter the coefficient of polynomial :";
+    for(int i=0;i<degree+1;i++)cin>>coeff[i];
+    double xmax=sqrt((coeff[1]/coeff[0])*(coeff[1]/coeff[0])-2*(coeff[2]/coeff[0]));
+  double a,b,c,root=0;
+  for(double i=-xmax;i<=xmax;i+=0.5){
+        a=i;
+      b=i+0.5;
+        double fa=f(a),fb=f(b);
+   // cout<<a<<" "<<b<<" "<<fa*fb<<endl;
+    if(fa*fb<0){
+       double it=0;
+       root++;
+   double e=0.0001;
+  do{
+        it++;
 
-    if(f(a)*f(b) > 0){
-        cout << "Invalid bracket.\n";
-        return 0;
+     c=a-f(a)*((b-a)/(f(b)-f(a)));
+   // cout<<"a="<<a<<" f(a)="<<f(a)<<" b="<<b<<" f(b)="<<f(b)<<" c="<<c<<" f(c)="<<f(c)<<endl;
+    if(fabs(c)<=e) break;
+    if(f(c)*f(a)<0)b=c;
+    else a=c;
+  }while(fabs(f(c))> e && fabs(b-a)>e);
+   cout<<"the root "<< root<<" is: "<<c<<endl;
+    cout<<"search interval ["<<i<<","<<i+0.5<<"]"<<endl;
+    cout<<"iteration is:"<<it<<endl<<endl;
     }
+  }
 
-    double c=a;
-    for(int i=1;i<=maxIter;i++){
-        double fa=f(a), fb=f(b);
-        c = (a*fb - b*fa) / (fb - fa); // regula falsi
-        double fc = f(c);
-        if (fabs(fc) < eps) break;
-        if (fa*fc < 0) b=c;
-        else a=c;
-        if (fabs(b-a) < eps) break;
-    }
 
-    cout.setf(std::ios::fixed); cout<<setprecision(10);
-    cout << "Root ~ " << c << "\n";
-    return 0;
+
+
 }
+
+
+
 ```
 
 ---
@@ -412,36 +435,96 @@ int main(){
 **File:** `NonLinear/secant.cpp`
 
 ```
-#include <bits/stdc++.h>
+#include<bits/stdc++.h>
 using namespace std;
-
-double f(double x){
-    return x*x*x - x - 2;
-}
-
-int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-
-    double x0,x1,eps; int maxIter;
-    cin >> x0 >> x1 >> eps >> maxIter;
-
-    double x2=x1;
-    for(int i=1;i<=maxIter;i++){
-        double f0=f(x0), f1=f(x1);
-        if (fabs(f1-f0) < 1e-15){
-            cout << "Division by near-zero.\n";
-            return 0;
+vector<double>coeff;
+ void print(vector<double>coeff){
+     int power=coeff.size()-1;
+     bool m=false;
+     for(int i=0;i<coeff.size();i++){
+        if(coeff[i]==0){
+            power--;
+                continue;}
+        if(power==0){
+                if(coeff[i]>0)cout<<"+";
+            //else cout<<"-";
+               cout<<coeff[i];
+        continue;
+            }
+        if(!m){
+            m=true;
+            cout<<coeff[i]<<"X^"<<power;
         }
-        x2 = x1 - f1*(x1-x0)/(f1-f0);
-        if (fabs(x2-x1) < eps || fabs(f(x2)) < eps) break;
-        x0=x1; x1=x2;
-    }
+        else{
+            if(coeff[i]>0)cout<<"+";
+            //else cout<<"-";
+            cout<<coeff[i]<<"X^"<<power;
+        }
+        power--;
+     }
+     cout<<"=0"<<endl;
 
-    cout.setf(std::ios::fixed); cout<<setprecision(10);
-    cout << "Root ~ " << x2 << "\n";
-    return 0;
+ }
+ double f(double x){
+     double val=0;
+     double power=coeff.size()-1;
+     for(int i=0;i<coeff.size();i++){
+          val+= coeff[i]* pow(x,power);
+          power--;
+     }
+     return val;
+
+ }
+int main(){
+int degree;
+cout<<"enter the degree: ";
+cin>>degree;
+cout<<"enter the coefficient :";
+for(int i=0;i<=degree;i++){
+        int x;
+      cin>>x;
+     coeff.push_back(x);
 }
+cout<<"equation is: ";
+print(coeff);
+cout<<endl;
+double xmax=0,e=0.001;
+for(int i=0;i<coeff.size();i++){
+    double temp=coeff[i]/coeff[0];
+    xmax=max(xmax,temp);
+}
+xmax++;
+double c=-xmax;
+while(c<=xmax){
+    double x0=c;
+    double x1=c+0.45;
+    double fx0=f(x0),fx1=f(x1);
+    if(fx0*fx1<0){
+        cout<<"search interval is: ["<<x0<<","<<x1<<"]"<<endl;
+        int it=0;
+        do{
+            double x2=x1-f(x1)*((x1-x0)/(fx1-fx0));
+            it++;
+            double fx2=f(x2);
+            if(abs(x1-x2)<e && fx2<e){
+                cout<<"root is ="<<x2<<endl<<"iteration is = "<<it<<endl<<endl;
+                break;
+            }
+            x0=x1;
+            x1=x2;
+            fx0=fx1;
+            fx1=fx2;
+
+        }
+        while(1);
+    }
+    c=c+0.45;
+}
+
+
+return 0;
+}
+
 ```
 
 ---
@@ -451,40 +534,94 @@ int main(){
 **File:** `NonLinear/newton_raphson.cpp`
 
 ```
-#include <bits/stdc++.h>
+#include<bits/stdc++.h>
 using namespace std;
+int degree;
+vector<double>coeff;
+void print(){
+    int d=degree;
+    bool m=true;
+    for(int i=0;i<degree+1;i++){
+            if(m){
+            cout<<coeff[i]<<"X^"<<d;
+            m=false;
+            d--;
+            continue;
 
-double f(double x){
-    return x*x*x - x - 2;
-}
-double df(double x){
-    return 3*x*x - 1;
-}
-
-int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-
-    double x,eps; int maxIter;
-    cin >> x >> eps >> maxIter;
-
-    for(int i=1;i<=maxIter;i++){
-        double d = df(x);
-        if (fabs(d) < 1e-15){
-            cout << "Derivative too small.\n";
-            return 0;
         }
-        double x1 = x - f(x)/d;
-        if (fabs(x1-x) < eps || fabs(f(x1)) < eps){
-            x = x1; break;
-        }
-        x = x1;
+        if(coeff[i]==0){
+                    d--;
+                continue;
+            }
+
+        if(coeff[i]>0)cout<<"+";
+        if(i!=degree)cout<<coeff[i]<<"X^"<<d;
+        else cout<<coeff[i];
+        d--;
     }
-
-    cout.setf(std::ios::fixed); cout<<setprecision(10);
-    cout << "Root ~ " << x << "\n";
-    return 0;
+    cout<<"=0"<<endl;
 }
+ double f(double x){
+
+   double val=0;
+     double deg=coeff.size()-1;
+     for(int i=0;i<coeff.size();i++){
+        val+= coeff[i]* pow(x,deg);
+        deg--;
+     }
+     return val;
+ }
+ double df(double x){
+    double val=0;
+     double deg=coeff.size()-1;
+     for(int i=0;i<coeff.size()-1;i++){
+        val+=coeff[i] *deg* pow(x,deg-1);
+        deg--;
+     }
+     return val;
+
+ }
+int main(){
+    cout<<"enter degree:";
+     cin>>degree;
+     cout<<"enter the coefficient:";
+     coeff.resize(degree+1);
+     for(int i=0;i<degree+1;i++){
+        cin>>coeff[i];
+     }
+     cout<<"equation is: ";
+     print();
+      double xmax=sqrt((coeff[1]/coeff[0])*(coeff[1]/coeff[0])-2*(coeff[2]/coeff[0]));
+      double c=-xmax;
+      double num=0,e=0.00001;
+      while(c<=xmax){
+        double x0=c,x1=c+0.65;
+        double fx0=f(x0),fx1=f(x1);
+        if(fx0*fx1<0){
+                num++;
+            cout<<"search interval is ["<<x0<<","<<x1<<"]"<<endl;
+            int it=0;
+            do{
+                double df1=df(x1);
+                double x2=x1-(fx1/df1);
+              double fx2=f(x2);
+              it++;
+              if(abs(x2-x1)<e|| abs(fx2-fx1)<e){
+                    cout<<"the root "<< num<<" is: "<<x2<<endl;
+                 cout<<"iteration is:"<<it<<endl<<endl;
+                break;
+              }
+              x1=x2;
+              fx1=fx2;
+
+            }while(1);
+        }
+        c=c+0.65;
+      }
+
+return 0;
+}
+
 ```
 
 ---
