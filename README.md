@@ -33,22 +33,22 @@ Numerical Methods Laboratory implementations in **C++**: solution of linear equa
     - [Output](#matrix-inversion-output)
 
 - [Solution of Non-Linear Equations](#solution-of-non-linear-equations)
-  - [Bisection Method](#bisection)
+  - [Bisection Method](#bisection-method)
     - [Theory](#bisection-theory)
     - [Code](#bisection-code)
     - [Input](#bisection-input)
     - [Output](#bisection-output)
-  - [False Position Method](#false-position)
+  - [False Position Method](#false-position-method)
     - [Theory](#false-position-theory)
     - [Code](#false-position-code)
     - [Input](#false-position-input)
     - [Output](#false-position-output)
-  - [Secant Method](#secant)
+  - [Secant Method](#secant-method)
     - [Theory](#secant-theory)
     - [Code](#secant-code)
     - [Input](#secant-input)
     - [Output](#secant-output)
-  - [Newton Raphson Method](#newton-raphson)
+  - [Newton Raphson Method](#newton-raphson-method)
     - [Theory](#newton-raphson-theory)
     - [Code](#newton-raphson-code)
     - [Input](#newton-raphson-input)
@@ -1056,336 +1056,524 @@ x5 = 1.18462
 
 ---
 
-## Solution of Non-linear Equations
+## Solution of Non-Linear Equations
 
-> Edit the `f(x)` (and `df(x)` if needed) inside each file.
+### Bisection Method
 
-### Bisection
+#### Bisection Theory
+#### Objective
+To find a root of a nonlinear algebraic equation.
 
-**File:** `NonLinear/bisection.cpp`
+#### Data Requirement
+A polynomial equation of `n` degree:
 
+  - aₙxⁿ + aₙ₋₁xⁿ⁻¹ + … + a₂x² + a₁x + a₀ = 0
+
+#### Core Idea
+It repeatedly bisects an interval and then selects a subinterval in which a root must lie. Always converges if f(a) · f(b) < 0  
+**Formula:**
 ```
-#include<bits/stdc++.h>
+xₙ₊₁ = (a + b) / 2
+```
+
+#### Bisection Code
+```cpp
+#include <bits/stdc++.h>
+
 using namespace std;
-int degree;
-vector<double>coeff(degree+1);
- double f(double x){
-        double val=0;
-     double d=degree;
-     int n=coeff.size();
-     for(int i=0;i<n;i++){
-           //  cout<<degree<<endl;
-        double t=coeff[i]*(pow(x,d));
-        val+=t;
-        d--;
-     }
-
-   return val;
- }
-int main(){
-
-    cout<<"please1 enter the degree of polynomial equation :";
-    cin>>degree;
- coeff.resize(degree + 1);
-    cout<<"please enter the coefficient of polynomial :";
-    for(int i=0;i<degree+1;i++)cin>>coeff[i];
-    double xmax=sqrt((coeff[1]/coeff[0])*(coeff[1]/coeff[0])-2*(coeff[2]/coeff[0]));
-  double a,b,c,root=0;
-  for(double i=-xmax;i<=xmax;i+=0.5){
-        a=i;
-      b=i+0.5;
-        double fa=f(a),fb=f(b);
-   // cout<<a<<" "<<b<<" "<<fa*fb<<endl;
-    if(fa*fb<0){
-       double it=0;
-       root++;
-   double e=0.0001;
-  do{
-        it++;
-    //cout<<"ok"<<endl;
-    c= (a+b)/2.0;
-   // cout<<"a="<<a<<" f(a)="<<f(a)<<" b="<<b<<" f(b)="<<f(b)<<" c="<<c<<" f(c)="<<f(c)<<endl;
-    if(fabs(c)<=e) break;
-    if(f(c)*f(a)<0)b=c;
-    else a=c;
-  }while(fabs(f(c))> e && fabs(b-a)>e);
-   cout<<"the root "<< root<<" is: "<<c<<endl;
-    cout<<"search interval ["<<i<<","<<i+0.5<<"]"<<endl;
-    cout<<"iteration is:"<<it<<endl<<endl;
-    }
-  }
-
-
-
-
+double it;
+double func(double x)
+{
+    return pow(x, 4) - 5 * pow(x, 2) + 4;
 }
-
-```
-
----
-
-### False Position
-
-**File:** `NonLinear/false_position.cpp`
-
-```
-#include<bits/stdc++.h>
-using namespace std;
-int degree;
-vector<double>coeff(degree+1);
- double f(double x){
-        double val=0;
-     double d=degree;
-     int n=coeff.size();
-     for(int i=0;i<n;i++){
-           //  cout<<degree<<endl;
-        double t=coeff[i]*(pow(x,d));
-        val+=t;
-        d--;
-     }
-
-   return val;
- }
-int main(){
-
-    cout<<"please enter the degree of polynomial equation :";
-    cin>>degree;
- coeff.resize(degree + 1);
-    cout<<"please enter the coefficient of polynomial :";
-    for(int i=0;i<degree+1;i++)cin>>coeff[i];
-    double xmax=sqrt((coeff[1]/coeff[0])*(coeff[1]/coeff[0])-2*(coeff[2]/coeff[0]));
-  double a,b,c,root=0;
-  for(double i=-xmax;i<=xmax;i+=0.5){
-        a=i;
-      b=i+0.5;
-        double fa=f(a),fb=f(b);
-   // cout<<a<<" "<<b<<" "<<fa*fb<<endl;
-    if(fa*fb<0){
-       double it=0;
-       root++;
-   double e=0.0001;
-  do{
-        it++;
-
-     c=a-f(a)*((b-a)/(f(b)-f(a)));
-   // cout<<"a="<<a<<" f(a)="<<f(a)<<" b="<<b<<" f(b)="<<f(b)<<" c="<<c<<" f(c)="<<f(c)<<endl;
-    if(fabs(c)<=e) break;
-    if(f(c)*f(a)<0)b=c;
-    else a=c;
-  }while(fabs(f(c))> e && fabs(b-a)>e);
-   cout<<"the root "<< root<<" is: "<<c<<endl;
-    cout<<"search interval ["<<i<<","<<i+0.5<<"]"<<endl;
-    cout<<"iteration is:"<<it<<endl<<endl;
-    }
-  }
-
-
-
-
+double Xmax(vector<double> &cof, int n)
+{
+    return sqrt(pow(cof[1] / cof[0], 2) - 2 * (cof[2] / cof[0]));  
 }
-
-
-
-```
-
----
-
-### Secant
-
-**File:** `NonLinear/secant.cpp`
-
-```
-#include<bits/stdc++.h>
-using namespace std;
-vector<double>coeff;
- void print(vector<double>coeff){
-     int power=coeff.size()-1;
-     bool m=false;
-     for(int i=0;i<coeff.size();i++){
-        if(coeff[i]==0){
-            power--;
-                continue;}
-        if(power==0){
-                if(coeff[i]>0)cout<<"+";
-            //else cout<<"-";
-               cout<<coeff[i];
-        continue;
+double mid(double x1, double x2)
+{
+    return (x1 + x2) / 2;
+}
+int main()
+{
+    // X^4+0X^3-5X^2+4=0;
+    int n;
+    cout << "Enter the DEGREE OF The equation ";
+    cin >> n;
+    cout << "Enter the coffetient hign->low ";
+    vector<double> cof(n + 1);
+    for (int i = 0; i < n + 1; i++)
+    {
+        cin >> cof[i];
+    }
+    double xmax = Xmax(cof, n);
+    double xmin = xmax * (-1);
+    double step = 0.5;
+    double x;
+    for (double i = xmin + step; i <= xmax; i += step)
+    {
+        double x0 = xmin;
+        double x1 = i;
+        double f1 = func(x0);
+        double f2 = func(x1);
+        if (f1 * f2 < 0)
+        {
+            cout << "Bracket " << x0 << " " << x1 << endl;
+            it = 0;
+            while (true)
+            {
+                it++;
+                x = mid(x0, x1);
+                if (func(x0) * func(x) < 0)
+                {
+                    x1 = x;
+                }
+                else
+                {
+                    x0 = x;
+                }
+                if (fabs(func(x)) < 1e-6 || fabs(x1 - x0) < 1e-6)
+                {
+                    cout << "Value :" << x << endl;
+                    cout << "Number of itretion :" << it << endl;
+                    break;
+                }
             }
-        if(!m){
-            m=true;
-            cout<<coeff[i]<<"X^"<<power;
+            xmin = x + step;
+            i = xmin + step;
         }
-        else{
-            if(coeff[i]>0)cout<<"+";
-            //else cout<<"-";
-            cout<<coeff[i]<<"X^"<<power;
-        }
-        power--;
-     }
-     cout<<"=0"<<endl;
-
- }
- double f(double x){
-     double val=0;
-     double power=coeff.size()-1;
-     for(int i=0;i<coeff.size();i++){
-          val+= coeff[i]* pow(x,power);
-          power--;
-     }
-     return val;
-
- }
-int main(){
-int degree;
-cout<<"enter the degree: ";
-cin>>degree;
-cout<<"enter the coefficient :";
-for(int i=0;i<=degree;i++){
-        int x;
-      cin>>x;
-     coeff.push_back(x);
-}
-cout<<"equation is: ";
-print(coeff);
-cout<<endl;
-double xmax=0,e=0.001;
-for(int i=0;i<coeff.size();i++){
-    double temp=coeff[i]/coeff[0];
-    xmax=max(xmax,temp);
-}
-xmax++;
-double c=-xmax;
-while(c<=xmax){
-    double x0=c;
-    double x1=c+0.45;
-    double fx0=f(x0),fx1=f(x1);
-    if(fx0*fx1<0){
-        cout<<"search interval is: ["<<x0<<","<<x1<<"]"<<endl;
-        int it=0;
-        do{
-            double x2=x1-f(x1)*((x1-x0)/(fx1-fx0));
-            it++;
-            double fx2=f(x2);
-            if(abs(x1-x2)<e && fx2<e){
-                cout<<"root is ="<<x2<<endl<<"iteration is = "<<it<<endl<<endl;
-                break;
-            }
-            x0=x1;
-            x1=x2;
-            fx0=fx1;
-            fx1=fx2;
-
-        }
-        while(1);
+        xmin+=step;
     }
-    c=c+0.45;
 }
-
-
-return 0;
-}
-
 ```
 
+#### Bisection Input
+```
+4
+1 0 -5 0 4
+```
+
+#### Bisection Output
+```
+Value :-2
+Number of itretion :19
+Value :-0.999999
+Number of itretion :19
+Value :1
+Number of itretion :19
+Value :2
+Number of itretion :19
+```
+#### [Back to Contents](#table-of-contents)
 ---
 
-### Newton Raphson
+### False Position Method
 
-**File:** `NonLinear/newton_raphson.cpp`
+#### False Position Theory
+#### Objective
+To solve nonlinear algebraic equation using a bracketing method based on linear interpolation.
 
+#### Data Requirement
+A polynomial equation of `n` degree:
+
+  - aₙxⁿ + aₙ₋₁xⁿ⁻¹ + … + a₂x² + a₁x + a₀ = 0
+
+#### Core Idea
+Uses linear interpolation between two points where the function has opposite signs. Draws a straight line connecting the function values at the endpoints and finds where it crosses the x-axis. More efficient than bisection method. 
+
+**Formula:**
 ```
-#include<bits/stdc++.h>
+xₙ₊₁ = (a · f(b) - b · f(a)) / (f(b) - f(a))
+```
+
+#### False Position Code
+```cpp
+#include <bits/stdc++.h>
+
+using namespace std;
+double it = 0;
+double func(double x)
+{
+    return pow(x, 4) - 5 * pow(x, 2) + 4;
+}
+double Xmax(vector<double> &cof, int n)
+{
+    // return sqrt(pow(an_1 / an, 2) - 2 * (an_2 / an));
+    return sqrt(pow(cof[1] / cof[0], 2) - 2 * (cof[2] / cof[0]));
+}
+double mid(double x1, double x2)
+{
+    return (x1 * func(x2) - x2 * func(x1)) / (func(x2) - func(x1));
+}
+int main()
+{
+    // X^4+0X^3-5X^2+4=0;
+    int n;
+    cout << "Enter the DEGREE OF The equation ";
+    cin >> n;
+    cout << "Enter the coffetient hign->low ";
+    vector<double> cof(n + 1);
+    for (int i = 0; i < n + 1; i++)
+    {
+        cin >> cof[i];
+    }
+    double xmax = Xmax(cof, n);
+    double xmin = xmax * (-1);
+    double step = 0.5;
+    double x;
+    for (double i = xmin + step; i <= xmax; i += step)
+    {
+        double x1 = xmin;
+        double x2 = i;
+        double f1 = func(x1);
+        double f2 = func(x2);
+        if (f1 * f2 < 0)
+        {
+            it = 0;
+            while (true)
+            {
+                it++;
+                x = mid(x1, x2);
+                if (func(x1) * func(x) < 0)
+                {
+                    x2 = x;
+                }
+                else
+                {
+                    x1 = x;
+                }
+                if (fabs(func(x)) < 1e-4 || fabs(x1 - x2) < 1e-4)
+                {
+                    cout << "Value :" << x << endl;
+                    cout << "Number of itretion :" << it << endl;
+                    break;
+                }
+            }
+            xmin = x + step;
+            i = xmin + step;
+        }
+    }
+}
+```
+
+#### False Position Input
+```
+4
+1 0 -5 0 4
+```
+
+#### False Position Output
+```
+Value :-2
+Number of itretion :11
+Value :-1
+Number of itretion :3
+Value :1
+Number of itretion :4
+Value :2
+Number of itretion :16
+```
+#### [Back to Contents](#table-of-contents)
+---
+
+### Secant Method
+
+#### Secant Theory
+#### Objective
+To solve nonlinear algebraic equation using an iterative method that approximates the derivative.
+
+#### Data Requirement
+A polynomial equation of `n` degree:
+
+  - aₙxⁿ + aₙ₋₁xⁿ⁻¹ + … + a₂x² + a₁x + a₀ = 0
+
+#### Core Idea
+Uses two initial approximations and draws a secant line through them to find the next approximation. Does not require derivative computation unlike Newton-Raphson.  
+**Formula:**
+```
+xₙ₊₁ = xₙ - (f(xₙ)(xₙ - xₙ₋₁)) / (f(xₙ) - f(xₙ₋₁))
+```
+
+#### Secant Code
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+vector<double> cof;
+int deg;
+double valueFunc(double x)
+{
+    int n = deg;
+    double value = 0;
+    for (int i = 0; i < cof.size(); i++)
+    {
+        value += cof[i] * pow(x, n);
+        n--;
+    }
+    return value;
+}
+
+void FunctionPrint()
+{
+    int n = deg;
+    for (int i = 0; i <= deg; i++)
+    {
+        if (cof[i] == 0)
+        {
+            n--;
+            continue;
+        }
+        if (i != 0 && cof[i] > 0)
+        {
+            cout << "+";
+        }
+        if (cof[i] < 0)
+        {
+            cout << "-";
+        }
+        double c = fabs(cof[i]);
+        if (!(c == 1 && n != 0))
+        {
+            cout << c;
+        }
+        if (n > 0)
+        {
+            cout << "X";
+        }
+        if (n > 1)
+        {
+            cout << "^" << n;
+        }
+        n--;
+    }
+    cout << "=0" << endl;
+}
+double X_i(double x1, double x2)
+{
+    return (x1 * valueFunc(x2) - x2 * valueFunc(x1)) / (valueFunc(x2) - valueFunc(x1));
+}
+int main()
+{
+    cout << "Enter DEGREE ";
+    cin >> deg;
+    cof.resize(deg + 1);
+    cout << "Enter thr coffitient ";
+    for (int i = 0; i < deg + 1; i++)
+    {
+        cin >> cof[i];
+    }
+    FunctionPrint();
+    double xmax = 0;
+    for (int i = 0; i < cof.size(); i++)
+    {
+        xmax = max(xmax, cof[i] / cof[0]);
+    }
+    xmax += 1;
+    double xmin = (-1) * xmax;
+    double step = 0.45;
+    int num = 0;
+    double x2;
+    for (double i = xmin + step; i <= xmax; i += step)
+    {
+        double x0 = xmin;
+        double x1 = i;
+        double f1 = valueFunc(x0);
+        double f2 = valueFunc(x1);
+        if (f1 * f2 < 0)
+        {
+            cout << "The range for root " << ++num << ": " << x0 << "--->" << x1 << endl;
+            while (true)
+            {
+                double temp = x1;
+                x1 = X_i(x0, x1);
+                x0 = temp;
+                if (fabs(x1 - x0) < 1e-3 && fabs(valueFunc(x1)) < 1e-3)
+                {
+                    cout << "Root " << num << " :" << x1 << endl;
+                    break;
+                }
+            }
+            xmin = x1 + step;
+            i = xmin + step;
+        }
+    }
+}
+```
+
+#### Secant Input
+```
+4
+1 0 -5 0 4
+```
+
+#### Secant Output
+```
+The range for root 1: -2.50--->-1.85
+Root 1 :-2.00002
+The range for root 2: -1.55002--->-0.65002
+Root 2 :-0.999998
+The range for root 3: -0.549998--->1.25
+Root 3 :1
+The range for root 4: 1.45--->2.35
+Root 4 :2
+```
+#### [Back to Contents](#table-of-contents)
+---
+
+### Newton Raphson Method
+
+#### Newton Raphson Theory
+#### Objective
+To solve nonlinear algebraic equation using tangent line approximation at each iteration.
+
+#### Data Requirement
+A polynomial equation of `n` degree:
+
+  - aₙxⁿ + aₙ₋₁xⁿ⁻¹ + … + a₂x² + a₁x + a₀ = 0
+
+#### Core Idea
+Starts with an initial guess and uses the tangent line at that point to find a better approximation. Requires both function and its derivative. Converges quadratically when close to root.
+
+**Formula:**
+```
+xₙ₊₁ = xₙ - f(xₙ) / f'(xₙ)
+```
+
+#### Newton Raphson Code
+```cpp
+#include <bits/stdc++.h>
 using namespace std;
 int degree;
-vector<double>coeff;
-void print(){
-    int d=degree;
-    bool m=true;
-    for(int i=0;i<degree+1;i++){
-            if(m){
-            cout<<coeff[i]<<"X^"<<d;
-            m=false;
+vector<double> coff;
+void print()
+{
+    int d = degree;
+    bool m = true;
+    for (int i = 0; i < degree + 1; i++)
+    {
+        if (m)
+        {
+            cout << coff[i] << "X^" << d;
+            m = false;
             d--;
             continue;
-
         }
-        if(coeff[i]==0){
-                    d--;
-                continue;
-            }
+        if (coff[i] == 0)
+        {
+            d--;
+            continue;
+        }
 
-        if(coeff[i]>0)cout<<"+";
-        if(i!=degree)cout<<coeff[i]<<"X^"<<d;
-        else cout<<coeff[i];
+        if (coff[i] > 0)
+            cout << "+";
+        if (i != degree)
+            cout << coff[i] << "X^" << d;
+        else
+            cout << coff[i];
         d--;
     }
-    cout<<"=0"<<endl;
+    cout << "=0" << endl;
 }
- double f(double x){
+double funcvalue(double x)
+{
 
-   double val=0;
-     double deg=coeff.size()-1;
-     for(int i=0;i<coeff.size();i++){
-        val+= coeff[i]* pow(x,deg);
+    double val = 0;
+    double deg = coff.size() - 1;
+    for (int i = 0; i < coff.size(); i++)
+    {
+        val += coff[i] * pow(x, deg);
         deg--;
-     }
-     return val;
- }
- double df(double x){
-    double val=0;
-     double deg=coeff.size()-1;
-     for(int i=0;i<coeff.size()-1;i++){
-        val+=coeff[i] *deg* pow(x,deg-1);
+    }
+    return val;
+}
+double derivative(double x)
+{
+    double val = 0;
+    double deg = coff.size() - 1;
+    for (int i = 0; i < coff.size() - 1; i++)
+    {
+        val += coff[i] * deg * pow(x, deg - 1);
         deg--;
-     }
-     return val;
+    }
+    return val;
+}
+int main()
+{
+    cout << "degree:";
+    cin >> degree;
+    cout << "cofficient:";
+    coff.resize(degree + 1);
+    for (int i = 0; i < degree + 1; i++)
+    {
+        cin >> coff[i];
+    }
+    cout << "equation  ";
+    print();
+    double xmax = sqrt((coff[1] / coff[0]) * (coff[1] / coff[0]) - 2 * (coff[2] / coff[0]));
+    double c = -xmax;
+    double num = 0;
+    double e = 0.00001;
+    while (c <= xmax)
+    {
+        double x0 = c, x1 = c + 0.65;
+        double f0 = funcvalue(x0), f1 = funcvalue(x1);
+        if (f0 * f1 < 0)
+        {
+            num++;
+            cout << " interval is (" << x0 << "," << x1 << ")" << endl;
+            int it = 0;
+            do
+            {
+                double derivative1 = derivative(x1);
+                double x2 = x1 - (f1 / derivative1);
+                double fx2 = funcvalue(x2);
+                it++;
+                if (abs(x2 - x1) < e || abs(fx2 - f1) < e)
+                {
+                    cout << "root " << num << " is: " << x2 << endl;
+                    cout << "iteration number:" << it << endl
+                         << endl;
+                    break;
+                }
+                x1 = x2;
+                f1 = fx2;
 
- }
-int main(){
-    cout<<"enter degree:";
-     cin>>degree;
-     cout<<"enter the coefficient:";
-     coeff.resize(degree+1);
-     for(int i=0;i<degree+1;i++){
-        cin>>coeff[i];
-     }
-     cout<<"equation is: ";
-     print();
-      double xmax=sqrt((coeff[1]/coeff[0])*(coeff[1]/coeff[0])-2*(coeff[2]/coeff[0]));
-      double c=-xmax;
-      double num=0,e=0.00001;
-      while(c<=xmax){
-        double x0=c,x1=c+0.65;
-        double fx0=f(x0),fx1=f(x1);
-        if(fx0*fx1<0){
-                num++;
-            cout<<"search interval is ["<<x0<<","<<x1<<"]"<<endl;
-            int it=0;
-            do{
-                double df1=df(x1);
-                double x2=x1-(fx1/df1);
-              double fx2=f(x2);
-              it++;
-              if(abs(x2-x1)<e|| abs(fx2-fx1)<e){
-                    cout<<"the root "<< num<<" is: "<<x2<<endl;
-                 cout<<"iteration is:"<<it<<endl<<endl;
-                break;
-              }
-              x1=x2;
-              fx1=fx2;
-
-            }while(1);
+            } while (1);
         }
-        c=c+0.65;
-      }
+        c = c + 0.65;
+    }
 
-return 0;
+    return 0;
 }
 
 ```
 
----
+#### Newton Raphson Input
+```
+4
+1 0 -5 0 4
+```
 
+#### Newton Raphson Output
+```
+equation  1X^4-5X^2+4=0
+interval is (-2.51228,-1.86228)
+root 1 is: -2
+iteration number:5
+
+interval is (-1.21228,-0.562278)
+root 2 is: -1
+iteration number:4
+
+interval is (0.737722,1.38772)
+root 3 is: 1
+iteration number:4
+
+ interval is (1.38772,2.03772)
+root 4 is: 2
+iteration number:3
+```
+#### [Back to Contents](#table-of-contents)
+---
 ## Interpolation
 
 ### Newton Forward
