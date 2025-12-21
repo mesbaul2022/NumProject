@@ -16,7 +16,7 @@ Numerical Methods Laboratory implementations in **C++**: solution of linear equa
     - [Code](#gauss-elimination-code)
     - [Input](#gauss-elimination-input)
     - [Output](#gauss-elimination-output)
-  - [Gauss Jordan Elimination Method](#gauss-jordan)
+  - [Gauss Jordan Elimination Method](#gauss-jordan-elimination-method)
     - [Theory](#gauss-jordan-theory)
     - [Code](#gauss-jordan-code)
     - [Input](#gauss-jordan-input)
@@ -341,267 +341,97 @@ Rⱼ ← Rⱼ − aⱼᵢ Rᵢ (j ≠ i)
 
 where `I` is the identity matrix and `X` contains the solution.
 
-#### Evaluation Process
-The solution is obtained directly as:
-```
-xᵢ = bᵢ
-```
-#### Accuracy Considerations
-- More computationally expensive than Gauss Elimination
-- Sensitive to rounding errors for large systems
-
-#### Applicability
-- Used when a direct solution or matrix inverse is required
-
-
 #### Gauss Jordan Code
 ```cpp
 #include <bits/stdc++.h>
 using namespace std;
 
-int main() {
-
-    // File Handling
-    ifstream in("input.txt");
-    ofstream out("output.txt");
-
-    if (!in) {
-        cerr << "Error: input.txt not found\n";
-        return 1;
-    }
-
-    int casing;
-    in >> casing;
-    int r=1;
-
-    while (casing--){
-    out << "----- Case " << r++ << " -----\n\n";
+void solve() {
     int n;
-    in >> n;
+    cout<<"Enter the number of variable ";
+    cin >> n;
+    vector<vector<double>> a(n, vector<double>(n + 1));
+    double EPS = 1e-12;
+    cout<<"Enter the matrix "<<endl;
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j <= n; j++) cin >> a[i][j];
 
-    vector<vector<float>> a(n, vector<float>(n + 1));
-    cout<<endl;
-
-    // Reading augmented matrix
     for (int i = 0; i < n; i++) {
-        for (int j = 0; j <= n; j++) {
-            in >> a[i][j];
-        }
-    }
-
-    //Copy of matrix for echelon form
-    vector<vector<float>> echelon = a;
-
-    // Forward Elimination (Echelon Form)
-    for (int i = 0; i < n; i++) {
-
-        int maxRow = i;
-        for (int k = i + 1; k < n; k++) {
-            if (fabs(echelon[k][i]) > fabs(echelon[maxRow][i]))
-                maxRow = k;
-        }
-
-        swap(echelon[i], echelon[maxRow]);
-
-        if (fabs(echelon[i][i]) < 1e-9)
-            continue;
-
-        for (int k = i + 1; k < n; k++) {
-            float factor = echelon[k][i] / echelon[i][i];
-            for (int j = i; j <= n; j++) {
-                echelon[k][j] -= factor * echelon[i][j];
+        int pivotrow = i;
+            while (pivotrow < n && abs(a[pivotrow][i]) < EPS) {
+                pivotrow++;
             }
-        }
-    }
 
-    // Printing Echelon Form
-    out << "Echelon Form (Upper Triangular):\n";
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j <= n; j++)
-            out << fixed << setprecision(4) << echelon[i][j] << " ";
-        out << "\n";
-    }
-    out << "\n";
+            if (pivotrow == n) continue;
+            swap(a[i], a[pivotrow]);
 
-   
-    int rankA = 0, rankAug = 0;
-    const float EPS = 1e-9;
-
-    for (int i = 0; i < n; i++) {
-        bool nonZeroCoeff = false;
-        bool nonZeroAug = false;
+        double t = a[i][i];
+        for (int j = 0; j <= n; j++) a[i][j] /= t;
 
         for (int j = 0; j < n; j++) {
-            if (fabs(echelon[i][j]) > EPS)
-                nonZeroCoeff = true;
-        }
-
-        if (fabs(echelon[i][n]) > EPS)
-            nonZeroAug = true;
-
-        if (nonZeroCoeff)
-            rankA++;
-
-        if (nonZeroCoeff || nonZeroAug)
-            rankAug++;
-    }
-
-    out << "System Classification:\n";
-
-    if (rankA < rankAug) {
-        out << "→ No Solution (Inconsistent System)\n";
-        continue;
-    }
-    else if (rankA < n) {
-        out << "→ Infinite Solutions (Dependent System)\n";
-        continue;
-    }
-    else {
-        out << "→ Unique Solution Exists\n\n";
-    }
-
-    
-    for (int i = 0; i < n; i++) {
-
-        int maxRow = i;
-        for (int k = i + 1; k < n; k++) {
-            if (fabs(a[k][i]) > fabs(a[maxRow][i]))
-                maxRow = k;
-        }
-
-        swap(a[i], a[maxRow]);
-
-        float pivot = a[i][i];
-        if (fabs(pivot) < EPS) {
-            out << "Numerical instability detected.\n";
-            return 1;
-        }
-
-        // Normalize pivot row
-        for (int j = 0; j <= n; j++)
-            a[i][j] /= pivot;
-
-        // Eliminate other rows
-        for (int k = 0; k < n; k++) {
-            if (k != i) {
-                float factor = a[k][i];
-                for (int j = 0; j <= n; j++)
-                    a[k][j] -= factor * a[i][j];
+            if (i != j) {
+                double r = a[j][i];
+                for (int k = 0; k <= n; k++) a[j][k] -= r * a[i][k];
             }
         }
     }
 
-     // Printing Row Reduced Echelon Form
-    out << "The Row Reduced Echelon Form:\n";
+    bool inf = false, none = false;
     for (int i = 0; i < n; i++) {
-        for (int j = 0; j <= n; j++)
-            out << fixed << setprecision(4) << a[i][j] << " ";
-        out << "\n";
-    }
-    out << "\n";
-
-
-    //Output Solution
-    out << "Solution:\n";
-    for (int i = 0; i < n; i++) {
-        out << "x" << i + 1 << " = " << a[i][n] << "\n";
-    }
+        bool zero = true;
+        for (int j = 0; j < n; j++) if (fabs(a[i][j]) > EPS) zero = false;
+        if (zero) {
+            if (fabs(a[i][n]) > EPS) none = true;
+            else inf = true;
+        }
     }
 
-    return 0;
+    if (none) cout << "NO solution" << endl;
+    else if (inf) cout << "INFINITE Solution" << endl;
+    else {
+        cout << "Unique solution: ";
+        for (int i = 0; i < n; i++) cout << a[i][n] << " ";
+        cout << endl;
+    }
 }
 
-
+int main() {
+    int t;
+    cout << "Enter number of test cases: ";
+    cin >> t;
+    while (t--) {
+        solve();
+        cout<<endl;
+    }
+    return 0;
+}
 
 ```
 
 #### Gauss Jordan Input
 ```
-4
 3
-2 1 -1 8
--3 -1 2 -11
--2 1 2 -3
-2
-1 1 2
-2 2 4
-2
-1 1 2
-2 2 5
-5
-2 1 -1 3 2 9
-1 3 2 -1 1 8
-3 2 4 1 -2 20
-2 1 3 2 1 17
-1 -1 2 3 4 15
+3
+1 1 1 6
+0 2 5 -4
+2 5 -1 27
+3
+1 2 3 5
+2 4 6 12
+1 1 1 4
+3
+1 2 3 5
+2 4 6 10
+1 1 1 4
 ```
 
 #### Gauss Jordan Output
 ```
------ Case 1 -----
+Unique solution: 5 3 -2
 
-Echelon Form (Upper Triangular):
--3.0000 -1.0000 2.0000 -11.0000 
-0.0000 1.6667 0.6667 4.3333 
-0.0000 0.0000 0.2000 -0.2000 
+NO solution
 
-System Classification:
-→ Unique Solution Exists
-
-The Row Reduced Echelon Form:
-1.0000 0.0000 0.0000 2.0000 
-0.0000 1.0000 0.0000 3.0000 
-0.0000 0.0000 1.0000 -1.0000 
-
-Solution:
-x1 = 2.0000
-x2 = 3.0000
-x3 = -1.0000
-
------ Case 2 -----
-
-Echelon Form (Upper Triangular):
-2.0000 2.0000 4.0000 
-0.0000 0.0000 0.0000 
-
-System Classification:
-→ Infinite Solutions (Dependent System)
-
------ Case 3 -----
-
-Echelon Form (Upper Triangular):
-2.0000 2.0000 5.0000 
-0.0000 0.0000 -0.5000 
-
-System Classification:
-→ No Solution (Inconsistent System)
-
------ Case 4 -----
-
-Echelon Form (Upper Triangular):
-3.0000 2.0000 4.0000 1.0000 -2.0000 20.0000 
-0.0000 2.3333 0.6667 -1.3333 1.6667 1.3333 
-0.0000 0.0000 -3.5714 2.1429 3.5714 -4.1429 
-0.0000 0.0000 0.0000 2.4000 7.0000 7.9600 
-0.0000 0.0000 0.0000 0.0000 -1.0833 -1.2833 
-
-System Classification:
-→ Unique Solution Exists
-
-The Row Reduced Echelon Form:
-1.0000 0.0000 0.0000 0.0000 0.0000 5.1538 
-0.0000 1.0000 0.0000 0.0000 0.0000 -1.0000 
-0.0000 0.0000 1.0000 0.0000 0.0000 2.2615 
-0.0000 0.0000 0.0000 1.0000 0.0000 -0.1385 
--0.0000 -0.0000 -0.0000 -0.0000 1.0000 1.1846 
-
-Solution:
-x1 = 5.1538
-x2 = -1.0000
-x3 = 2.2615
-x4 = -0.1385
-x5 = 1.1846
-
+INFINITE Solution
 
 ```
 #### [Back to Contents](#table-of-contents)
