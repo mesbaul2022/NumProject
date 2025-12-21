@@ -920,64 +920,86 @@ int main()
 #include <bits/stdc++.h>
 using namespace std;
 
-static const double EPS = 1e-12;
+void gaus(vector<vector<double>> &matrix, vector<double> &res)
+{
+    int n = matrix.size();
+    for (int i = 0; i < n; i++)
+    {
+        int piv = i;
+        for (int j = i + 1; j < n; j++)
+        {
+            if (fabs(matrix[j][i]) > fabs(matrix[piv][i]))
+            {
+                piv = j;
+            }
+        }
+        swap(matrix[i], matrix[piv]);
 
-int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+        for (int j = i + 1; j < n; j++)
+        {
+            double r = matrix[j][i] / matrix[i][i];
+            for (int k = i; k <= n; k++)
+            {
+                matrix[j][k] -= r * matrix[i][k];
+            }
+        }
+    }
+    res.assign(n, 0);
+    for (int i = n - 1; i >= 0; i--)
+    {
+        res[i] = matrix[i][n];
+        for (int j = i + 1; j < n; j++)
+        {
+            res[i] -= matrix[i][j] * res[j];
+        }
+        res[i] /= matrix[i][i];
+    }
+}
 
-    int n, m;
-    cin >> n >> m;              // n points, degree m
+int main()
+{
+    int d, n;
+    cout << "Enter the degree: ";
+    cin >> d;
+    cout << "Enter the number of data: ";
+    cin >> n;
+
     vector<double> x(n), y(n);
-    for(int i=0;i<n;i++) cin >> x[i] >> y[i];
+    cout << "Enter the value of x: ";
+    for (int i = 0; i < n; i++)
+        cin >> x[i];
 
-    int dim = m+1;
-    vector<vector<double>> A(dim, vector<double>(dim,0.0));
-    vector<double> B(dim,0.0);
+    cout << "Enter the value of y: ";
+    for (int i = 0; i < n; i++)
+        cin >> y[i];
 
-    // Build normal equations
-    vector<double> sx(2*m+1,0.0);
-    for(int k=0;k<=2*m;k++){
-        for(int i=0;i<n;i++) sx[k] += pow(x[i], k);
-    }
-    for(int i=0;i<dim;i++){
-        for(int j=0;j<dim;j++) A[i][j] = sx[i+j];
-        for(int t=0;t<n;t++) B[i] += y[t]*pow(x[t], i);
-    }
-
-    // Solve A * coeff = B using Gauss elimination
-    vector<vector<double>> aug(dim, vector<double>(dim+1));
-    for(int i=0;i<dim;i++){
-        for(int j=0;j<dim;j++) aug[i][j]=A[i][j];
-        aug[i][dim]=B[i];
-    }
-
-    for(int col=0; col<dim; col++){
-        int pivot=col;
-        for(int r=col;r<dim;r++)
-            if (fabs(aug[r][col]) > fabs(aug[pivot][col])) pivot=r;
-        if (fabs(aug[pivot][col]) < EPS){
-            cout << "Cannot fit (singular normal matrix).\n";
-            return 0;
+    vector<vector<double>> matrix(d + 1, vector<double>(d + 2, 0));
+    for (int i = 0; i <= d; i++)
+    {
+        for (int j = 0; j <= d; j++)
+        {
+            for (int k = 0; k < n; k++)
+            {
+                matrix[i][j] += pow(x[k], i + j);
+            }
         }
-        swap(aug[pivot], aug[col]);
-        for(int r=col+1;r<dim;r++){
-            double factor = aug[r][col]/aug[col][col];
-            for(int k=col;k<=dim;k++) aug[r][k]-=factor*aug[col][k];
+        for (int k = 0; k < n; k++)
+        {
+            matrix[i][d + 1] += y[k] * pow(x[k], i);
         }
     }
 
-    vector<double> c(dim);
-    for(int i=dim-1;i>=0;i--){
-        double sum=aug[i][dim];
-        for(int j=i+1;j<dim;j++) sum-=aug[i][j]*c[j];
-        c[i]=sum/aug[i][i];
-    }
+    vector<double> res;
+    gaus(matrix, res);
 
-    cout.setf(std::ios::fixed); cout<<setprecision(10);
-    for(int i=0;i<dim;i++) cout << "a" << i << " = " << c[i] << "\n";
+    cout << "Polynomial coefficients :";
+    for (auto x : res)
+        cout << x << " ";
+    cout << endl;
+
     return 0;
 }
+
 ```
 
 ---
