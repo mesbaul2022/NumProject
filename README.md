@@ -5,8 +5,6 @@ Numerical Methods Laboratory implementations in **C++**: solution of linear equa
 ---
 
 ## Index
-
-- [How to run](#how-to-run)
 - [Solution of Linear Equations](#solution-of-linear-equations)
   - [Gauss Elimination](#gauss-elimination)
   - [Gauss Jordan](#gauss-jordan)
