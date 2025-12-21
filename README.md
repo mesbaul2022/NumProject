@@ -747,35 +747,35 @@ int main(){
 **Note:** `n` must be even.
 
 ```
-#include <bits/stdc++.h>
+#include<bits/stdc++.h>
+
 using namespace std;
-
-double f(double x){
-    return 1.0/(1.0+x*x); // example
+double func(double x)
+{
+    return 2/(1+pow(x,3));
 }
-
-int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-
-    double a,b; int n;
-    cin >> a >> b >> n;
-    if(n%2!=0){
-        cout << "n must be even.\n";
-        return 0;
+int main()
+{
+    cout<<"Enter the value of a b n"<<endl;
+    double a,b,n;
+    cin>>a>>b>>n;
+    double h=(b-a)/n;
+    double sum=func(a)+func(b);
+    for(int i=1;i<n;i++)
+    {
+        double x=a+(i*h);
+        if(i%2==0)
+        {
+            sum+=2*func(x);
+        }
+        else
+        {
+            sum+=4*func(x);
+        }
     }
+    cout<<"result"<<endl;
+    cout<<(sum*h)/3<<endl;
 
-    double h = (b-a)/n;
-    double sum = f(a) + f(b);
-    for(int i=1;i<n;i++){
-        double x = a + i*h;
-        sum += (i%2? 4.0 : 2.0) * f(x);
-    }
-    double ans = (h/3.0)*sum;
-
-    cout.setf(std::ios::fixed); cout<<setprecision(10);
-    cout << "Integral ~ " << ans << "\n";
-    return 0;
 }
 ```
 
