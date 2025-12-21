@@ -123,7 +123,7 @@
 
 ## Solution of Linear Equations
 
-# gauss-elimination-method
+# Gauss Elimination Method
 
 #### Gauss Elimination Theory
 
