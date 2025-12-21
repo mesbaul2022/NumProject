@@ -127,246 +127,1102 @@ Numerical Methods Laboratory implementations in **C++**: solution of linear equa
 
 ### Gauss Elimination
 
-**Goal:** Solve \(Ax=b\) using forward elimination + back substitution.  
-**File:** `Linear/gauss_elimination.cpp`
+#### Gauss Elimination Theory
 
-**Input format**
-- `n`
-- `A` matrix (`n x n`)
-- `b` vector (`n`)
+#### Method used
+**Gauss Elimination Method**
 
+#### Objective
+To solve a system of linear algebraic equations by transforming it into an **upper triangular system**, followed by **back substitution**.
+
+#### Data Requirement
+A system of `n` linear equations:
 ```
+a₁₁x₁ + a₁₂x₂ + ... + a₁ₙxₙ = b₁
+a₂₁x₁ + a₂₂x₂ + ... + a₂ₙxₙ = b₂
+...
+aₙ₁x₁ + aₙ₂x₂ + ... + aₙₙxₙ = bₙ
+```
+
+Matrix form:
+```
+AX = B
+```
+
+#### Notation
+- `A = [aᵢⱼ]` : coefficient matrix of order `n × n`
+- `X = [x₁, x₂, ..., xₙ]ᵀ` : vector of unknowns
+- `B = [b₁, b₂, ..., bₙ]ᵀ` : constant vector
+
+#### Core Idea
+The system is simplified by eliminating variables using **elementary row operations** to obtain an upper triangular matrix.
+
+#### Elimination Approach (Formula)
+To eliminate element `aᵢⱼ` (where `j < i`):
+```
+Rᵢ ← Rᵢ − (aᵢⱼ / aⱼⱼ) Rⱼ
+```
+
+
+#### Phases Involved
+
+##### Forward Elimination
+Transforms the augmented matrix `[A | B]` into an **upper triangular form**.
+
+##### Back Substitution
+Solutions are obtained using:
+```
+xₙ = bₙ / aₙₙ
+xᵢ = (1 / aᵢᵢ) [ bᵢ − Σ (aᵢⱼ xⱼ) ], j = i+1 to n
+```
+#### Gauss Elimination Code
+```cpp
+
 #include <bits/stdc++.h>
 using namespace std;
 
-static const double EPS = 1e-12;
+const float EPS = 1e-6;
 
 int main() {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+    int t;
+    cout << "Enter number of test cases: ";
+    cin >> t;
 
-    int n;
-    cin >> n;
-    vector<vector<double>> a(n, vector<double>(n+1));
-    for(int i=0;i<n;i++){
-        for(int j=0;j<n;j++) cin >> a[i][j];
-    }
-    for(int i=0;i<n;i++) cin >> a[i][n];
+    for (int i = 1; i <= t; i++) {
+        int n;
+        cout << "Enter number of variables " << i << ": ";
+        cin >> n;
 
-    // Partial pivoting + forward elimination
-    for(int col=0; col<n; col++){
-        int pivot = col;
-        for(int row=col+1; row<n; row++)
-            if (fabs(a[row][col]) > fabs(a[pivot][col])) pivot = row;
-
-        if (fabs(a[pivot][col]) < EPS) {
-            cout << "No unique solution (singular matrix).\n";
-            return 0;
+        vector<vector<float>> matrix(n, vector<float>(n + 1));
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j <= n; j++) {
+                cin >> matrix[i][j];
+            }
         }
-        swap(a[pivot], a[col]);
 
-        for(int row=col+1; row<n; row++){
-            double factor = a[row][col] / a[col][col];
-            for(int k=col; k<=n; k++){
-                a[row][k] -= factor * a[col][k];
+        for (int i = 0; i < n; i++) {
+            int pivotrow = i;
+            while (pivotrow < n && abs(matrix[pivotrow][i]) < EPS) {
+                pivotrow++;
+            }
+
+            if (pivotrow == n) continue;
+            swap(matrix[i], matrix[pivotrow]);
+
+            float pivot = matrix[i][i];
+            for (int j = i; j <= n; j++) {
+                matrix[i][j] /= pivot;
+            }
+
+            for (int k = 0; k < n; k++) {
+                if (k != i) {
+                    float factor = matrix[k][i];
+                    for (int j = i; j <= n; j++) {
+                        matrix[k][j] -= factor * matrix[i][j];
+                    }
+                }
+            }
+        }
+        bool nosolution = false;
+        bool infinitesolution = false;
+        int rank = 0;
+
+        for (int i = 0; i < n; i++) {
+            bool allzero = true;
+            for (int j = 0; j < n; j++) {
+                if (abs(matrix[i][j]) > EPS) {
+                    allzero = false;
+                    break;
+                }
+            }
+
+            if (allzero) {
+                if (abs(matrix[i][n]) > EPS) {
+                    nosolution = true;
+                    break;
+                } else {
+                    infinitesolution = true;
+                }
+            } else {
+                rank++;
+            }
+        }
+
+        cout << "Case " << i << ":" << endl;
+        if (nosolution) {
+            cout << "No Solution" << endl;
+        } else if (infinitesolution || rank < n) {
+            cout << "Infinite Solutions" << endl;
+        } else {
+            cout << "Unique Solution:" << endl;
+            for (int i = 0; i < n; i++) {
+                cout<< matrix[i][n] <<" ";
+            }
+        }
+        cout << endl;
+
+    }
+
+    return 0;
+}
+
+```
+
+#### Gauss Elimination Input
+```
+3
+3
+1 1 1 6
+0 2 5 -4
+2 5 -1 27
+3
+1 2 3 5
+2 4 6 12
+1 1 1 4
+3
+1 2 3 5
+2 4 6 10
+1 1 1 4
+
+```
+
+#### Gauss Elimination Output
+```
+Case 1:
+Unique Solution:
+5 3 -2
+
+Case 2:
+No Solution
+
+Case 3:
+Infinite Solutions
+```
+#### [Back to Contents](#table-of-contents)
+---
+
+### Gauss Jordan Elimination Method
+
+#### Gauss Jordan Theory
+#### Method used
+**Gauss–Jordan Elimination Method**
+
+#### Objective
+To solve a system of linear equations by reducing the augmented matrix directly to **Reduced Row Echelon Form (RREF)**.
+
+#### Data Requirement
+Augmented matrix form:
+```
+[A | B]
+```
+
+#### Notation
+- `aᵢⱼ` : element of coefficient matrix
+- `bᵢ`  : element of constant vector
+
+#### Core Idea
+Each pivot element is made **unity**, and all other elements in its column are eliminated, producing an identity matrix.
+
+#### Elimination Approach (Formulae)
+
+**Normalization of pivot row:**
+```
+Rᵢ ← Rᵢ / aᵢᵢ
+```
+
+**Elimination of other rows:**
+```
+Rⱼ ← Rⱼ − aⱼᵢ Rᵢ (j ≠ i)
+```
+#### Matrix Form Obtained
+```
+[I | X]
+```
+
+where `I` is the identity matrix and `X` contains the solution.
+
+#### Evaluation Process
+The solution is obtained directly as:
+```
+xᵢ = bᵢ
+```
+#### Accuracy Considerations
+- More computationally expensive than Gauss Elimination
+- Sensitive to rounding errors for large systems
+
+#### Applicability
+- Used when a direct solution or matrix inverse is required
+
+
+#### Gauss Jordan Code
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+
+    // File Handling
+    ifstream in("input.txt");
+    ofstream out("output.txt");
+
+    if (!in) {
+        cerr << "Error: input.txt not found\n";
+        return 1;
+    }
+
+    int casing;
+    in >> casing;
+    int r=1;
+
+    while (casing--){
+    out << "----- Case " << r++ << " -----\n\n";
+    int n;
+    in >> n;
+
+    vector<vector<float>> a(n, vector<float>(n + 1));
+    cout<<endl;
+
+    // Reading augmented matrix
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j <= n; j++) {
+            in >> a[i][j];
+        }
+    }
+
+    //Copy of matrix for echelon form
+    vector<vector<float>> echelon = a;
+
+    // Forward Elimination (Echelon Form)
+    for (int i = 0; i < n; i++) {
+
+        int maxRow = i;
+        for (int k = i + 1; k < n; k++) {
+            if (fabs(echelon[k][i]) > fabs(echelon[maxRow][i]))
+                maxRow = k;
+        }
+
+        swap(echelon[i], echelon[maxRow]);
+
+        if (fabs(echelon[i][i]) < 1e-9)
+            continue;
+
+        for (int k = i + 1; k < n; k++) {
+            float factor = echelon[k][i] / echelon[i][i];
+            for (int j = i; j <= n; j++) {
+                echelon[k][j] -= factor * echelon[i][j];
             }
         }
     }
 
-    // Back substitution
-    vector<double> x(n);
-    for(int i=n-1; i>=0; i--){
-        double sum = a[i][n];
-        for(int j=i+1; j<n; j++) sum -= a[i][j]*x[j];
-        x[i] = sum / a[i][i];
+    // Printing Echelon Form
+    out << "Echelon Form (Upper Triangular):\n";
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j <= n; j++)
+            out << fixed << setprecision(4) << echelon[i][j] << " ";
+        out << "\n";
     }
+    out << "\n";
 
-    cout.setf(std::ios::fixed); cout<<setprecision(6);
-    for(int i=0;i<n;i++) cout << "x["<<i<<"] = " << x[i] << "\n";
-    return 0;
-}
-```
+   
+    int rankA = 0, rankAug = 0;
+    const float EPS = 1e-9;
 
----
+    for (int i = 0; i < n; i++) {
+        bool nonZeroCoeff = false;
+        bool nonZeroAug = false;
 
-### Gauss Jordan
-
-**Goal:** Solve \(Ax=b\) by reducing \([A|b]\) to RREF.  
-**File:** `Linear/gauss_jordan.cpp`
-
-```
-#include <bits/stdc++.h>
-using namespace std;
-
-static const double EPS = 1e-12;
-
-int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-
-    int n;
-    cin >> n;
-    vector<vector<double>> a(n, vector<double>(n+1));
-    for(int i=0;i<n;i++){
-        for(int j=0;j<n;j++) cin >> a[i][j];
-    }
-    for(int i=0;i<n;i++) cin >> a[i][n];
-
-    for(int col=0; col<n; col++){
-        int pivot = col;
-        for(int row=col; row<n; row++)
-            if (fabs(a[row][col]) > fabs(a[pivot][col])) pivot = row;
-
-        if (fabs(a[pivot][col]) < EPS){
-            cout << "No unique solution (singular matrix).\n";
-            return 0;
+        for (int j = 0; j < n; j++) {
+            if (fabs(echelon[i][j]) > EPS)
+                nonZeroCoeff = true;
         }
-        swap(a[pivot], a[col]);
 
-        double div = a[col][col];
-        for(int k=col; k<=n; k++) a[col][k] /= div;
+        if (fabs(echelon[i][n]) > EPS)
+            nonZeroAug = true;
 
-        for(int row=0; row<n; row++){
-            if(row==col) continue;
-            double factor = a[row][col];
-            for(int k=col; k<=n; k++){
-                a[row][k] -= factor * a[col][k];
+        if (nonZeroCoeff)
+            rankA++;
+
+        if (nonZeroCoeff || nonZeroAug)
+            rankAug++;
+    }
+
+    out << "System Classification:\n";
+
+    if (rankA < rankAug) {
+        out << "→ No Solution (Inconsistent System)\n";
+        continue;
+    }
+    else if (rankA < n) {
+        out << "→ Infinite Solutions (Dependent System)\n";
+        continue;
+    }
+    else {
+        out << "→ Unique Solution Exists\n\n";
+    }
+
+    
+    for (int i = 0; i < n; i++) {
+
+        int maxRow = i;
+        for (int k = i + 1; k < n; k++) {
+            if (fabs(a[k][i]) > fabs(a[maxRow][i]))
+                maxRow = k;
+        }
+
+        swap(a[i], a[maxRow]);
+
+        float pivot = a[i][i];
+        if (fabs(pivot) < EPS) {
+            out << "Numerical instability detected.\n";
+            return 1;
+        }
+
+        // Normalize pivot row
+        for (int j = 0; j <= n; j++)
+            a[i][j] /= pivot;
+
+        // Eliminate other rows
+        for (int k = 0; k < n; k++) {
+            if (k != i) {
+                float factor = a[k][i];
+                for (int j = 0; j <= n; j++)
+                    a[k][j] -= factor * a[i][j];
             }
         }
     }
 
-    cout.setf(std::ios::fixed); cout<<setprecision(6);
-    for(int i=0;i<n;i++) cout << "x["<<i<<"] = " << a[i][n] << "\n";
+     // Printing Row Reduced Echelon Form
+    out << "The Row Reduced Echelon Form:\n";
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j <= n; j++)
+            out << fixed << setprecision(4) << a[i][j] << " ";
+        out << "\n";
+    }
+    out << "\n";
+
+
+    //Output Solution
+    out << "Solution:\n";
+    for (int i = 0; i < n; i++) {
+        out << "x" << i + 1 << " = " << a[i][n] << "\n";
+    }
+    }
+
     return 0;
 }
+
+
+
 ```
 
+#### Gauss Jordan Input
+```
+4
+3
+2 1 -1 8
+-3 -1 2 -11
+-2 1 2 -3
+2
+1 1 2
+2 2 4
+2
+1 1 2
+2 2 5
+5
+2 1 -1 3 2 9
+1 3 2 -1 1 8
+3 2 4 1 -2 20
+2 1 3 2 1 17
+1 -1 2 3 4 15
+```
+
+#### Gauss Jordan Output
+```
+----- Case 1 -----
+
+Echelon Form (Upper Triangular):
+-3.0000 -1.0000 2.0000 -11.0000 
+0.0000 1.6667 0.6667 4.3333 
+0.0000 0.0000 0.2000 -0.2000 
+
+System Classification:
+→ Unique Solution Exists
+
+The Row Reduced Echelon Form:
+1.0000 0.0000 0.0000 2.0000 
+0.0000 1.0000 0.0000 3.0000 
+0.0000 0.0000 1.0000 -1.0000 
+
+Solution:
+x1 = 2.0000
+x2 = 3.0000
+x3 = -1.0000
+
+----- Case 2 -----
+
+Echelon Form (Upper Triangular):
+2.0000 2.0000 4.0000 
+0.0000 0.0000 0.0000 
+
+System Classification:
+→ Infinite Solutions (Dependent System)
+
+----- Case 3 -----
+
+Echelon Form (Upper Triangular):
+2.0000 2.0000 5.0000 
+0.0000 0.0000 -0.5000 
+
+System Classification:
+→ No Solution (Inconsistent System)
+
+----- Case 4 -----
+
+Echelon Form (Upper Triangular):
+3.0000 2.0000 4.0000 1.0000 -2.0000 20.0000 
+0.0000 2.3333 0.6667 -1.3333 1.6667 1.3333 
+0.0000 0.0000 -3.5714 2.1429 3.5714 -4.1429 
+0.0000 0.0000 0.0000 2.4000 7.0000 7.9600 
+0.0000 0.0000 0.0000 0.0000 -1.0833 -1.2833 
+
+System Classification:
+→ Unique Solution Exists
+
+The Row Reduced Echelon Form:
+1.0000 0.0000 0.0000 0.0000 0.0000 5.1538 
+0.0000 1.0000 0.0000 0.0000 0.0000 -1.0000 
+0.0000 0.0000 1.0000 0.0000 0.0000 2.2615 
+0.0000 0.0000 0.0000 1.0000 0.0000 -0.1385 
+-0.0000 -0.0000 -0.0000 -0.0000 1.0000 1.1846 
+
+Solution:
+x1 = 5.1538
+x2 = -1.0000
+x3 = 2.2615
+x4 = -0.1385
+x5 = 1.1846
+
+
+```
+#### [Back to Contents](#table-of-contents)
 ---
 
-### LU Decomposition
+### LU Decomposition Method
 
-**Goal:** Factorize \(A = LU\) (Doolittle) and solve \(Ax=b\).  
-**File:** `Linear/lu_decomposition.cpp`
+#### LU Decomposition Theory
+#### Method used
+**LU Decomposition Method**
 
+#### Objective
+To solve a system of linear equations by factorizing the coefficient matrix into lower and upper triangular matrices.
+
+#### Data Requirement
+A square matrix with non-zero pivots.
+
+#### Core Idea (Formula)
 ```
+A = LU
+```
+
+#### Notation
+- `L = [lᵢⱼ]` : lower triangular matrix
+- `U = [uᵢⱼ]` : upper triangular matrix
+- `A` : coefficient matrix
+- `X` : solution vector
+- `B` : constant vector
+
+#### Solution Process
+
+**Step 1:** Solve
+```
+LY = B
+```
+using forward substitution:
+```
+yᵢ = bᵢ − Σ (lᵢⱼ yⱼ), j = 1 to i−1
+```
+
+**Step 2:** Solve
+```
+UX = Y
+```
+using back substitution:
+```
+xᵢ = (1 / uᵢᵢ) [ yᵢ − Σ (uᵢⱼ xⱼ) ], j = i+1 to n
+```
+
+#### Accuracy Considerations
+- More efficient than repeated Gauss Elimination
+- Numerical stability improves with pivoting
+
+#### Applicability
+- Ideal for solving multiple systems with the same coefficient matrix
+
+
+#### LU Decomposition Code
+```cpp
 #include <bits/stdc++.h>
 using namespace std;
 
-static const double EPS = 1e-12;
+int main()
+{
 
-int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+    // ---- File Handling ----
+    ifstream in("input.txt");
+    ofstream out("output.txt");
 
-    int n;
-    cin >> n;
-    vector<vector<double>> A(n, vector<double>(n));
-    vector<double> b(n);
-    for(int i=0;i<n;i++) for(int j=0;j<n;j++) cin >> A[i][j];
-    for(int i=0;i<n;i++) cin >> b[i];
+    if (!in)
+    {
+        cerr << "Error: input.txt not found\n";
+        return 1;
+    }
 
-    vector<vector<double>> L(n, vector<double>(n,0.0)), U(n, vector<double>(n,0.0));
-    for(int i=0;i<n;i++) L[i][i] = 1.0;
+    int casing;
+    in >> casing;
+    int r = 1;
 
-    for(int i=0;i<n;i++){
-        for(int j=i;j<n;j++){
-            double sum = 0;
-            for(int k=0;k<i;k++) sum += L[i][k]*U[k][j];
-            U[i][j] = A[i][j] - sum;
+    while (casing--)
+    {
+        cout << endl;
+        out << "----- Case " << r++ << " -----\n\n";
+        int n;
+        in >> n;
+
+        vector<vector<double>> a(n + 1, vector<double>(n + 2));
+
+        // Read augmented matrix A|b
+        for (int i = 1; i <= n; i++)
+        {
+            for (int j = 1; j <= n + 1; j++)
+            {
+                in >> a[i][j];
+            }
         }
-        if (fabs(U[i][i]) < EPS){
-            cout << "LU failed (zero pivot). Try pivoting-based LU.\n";
-            return 0;
+
+        vector<vector<double>> u(n + 1, vector<double>(n + 1, 0));
+        vector<vector<double>> l(n + 1, vector<double>(n + 1, 0));
+
+        for (int i = 1; i <= n; i++)
+        {
+            l[i][i] = 1;
         }
-        for(int j=i+1;j<n;j++){
-            double sum = 0;
-            for(int k=0;k<i;k++) sum += L[j][k]*U[k][i];
-            L[j][i] = (A[j][i] - sum) / U[i][i];
+
+        // ---- LU Decomposition ----
+        for (int i = 1; i <= n; i++)
+        {
+            for (int j = 1; j <= n; j++)
+            {
+
+                if (i <= j)
+                {
+                    u[i][j] = a[i][j];
+                    for (int k = 1; k < i; k++)
+                        u[i][j] -= l[i][k] * u[k][j];
+                }
+                else
+                {
+                    l[i][j] = a[i][j];
+                    for (int k = 1; k < j; k++)
+                        l[i][j] -= l[i][k] * u[k][j];
+
+                    if (u[j][j] == 0)
+                    {
+                        out << "Matrix is singular. Cannot compute LU decomposition.\n";
+                        return 0;
+                    }
+
+                    l[i][j] /= u[j][j];
+                }
+            }
+        }
+
+        // ---- Print U Matrix ----
+        out << "U Matrix:\n";
+        for (int i = 1; i <= n; i++)
+        {
+            for (int j = 1; j <= n; j++)
+            {
+                out << u[i][j] << " ";
+            }
+            out << "\n";
+        }
+
+        // ---- Print L Matrix ----
+        out << "\nL Matrix:\n";
+        for (int i = 1; i <= n; i++)
+        {
+            for (int j = 1; j <= n; j++)
+            {
+                out << l[i][j] << " ";
+            }
+            out << "\n";
+        }
+
+        // ---- Forward Substitution: Ly = b ----
+        vector<double> y(n + 1, 0);
+
+        for (int i = 1; i <= n; i++)
+        {
+            y[i] = a[i][n + 1];
+            for (int k = 1; k < i; k++)
+            {
+                y[i] -= l[i][k] * y[k];
+            }
+        }
+
+        // ---- Check Solution Type ----
+        bool noSolution = false;
+        bool infiniteSolution = false;
+
+        for (int i = 1; i <= n; i++)
+        {
+            bool allZero = true;
+
+            for (int j = 1; j <= n; j++)
+            {
+                if (fabs(u[i][j]) > 1e-9)
+                {
+                    allZero = false;
+                    break;
+                }
+            }
+
+            if (allZero)
+            {
+                if (fabs(y[i]) > 1e-9)
+                {
+                    noSolution = true;
+                }
+                else
+                {
+                    infiniteSolution = true;
+                }
+            }
+        }
+
+        if (noSolution)
+        {
+            out << "\nThe system has NO SOLUTION (Inconsistent equations).\n";
+            continue;
+        }
+
+        if (infiniteSolution)
+        {
+            out << "\nThe system has INFINITE SOLUTIONS (Dependent equations).\n";
+            continue;
+        }
+
+        out << "\nThe system has a UNIQUE SOLUTION.\n";
+
+        // ---- Backward Substitution: Ux = y ----
+        vector<double> ans(n + 1, 0);
+
+        for (int i = n; i >= 1; i--)
+        {
+            ans[i] = y[i];
+            for (int k = i + 1; k <= n; k++)
+            {
+                ans[i] -= u[i][k] * ans[k];
+            }
+            ans[i] /= u[i][i];
+        }
+
+        // ---- Print Solution ----
+        out << "\nFinal Solution (x values):\n";
+        for (int i = 1; i <= n; i++)
+        {
+            out << "x" << i << " = " << ans[i] << "\n";
         }
     }
 
-    // Forward substitution: Ly=b
-    vector<double> y(n);
-    for(int i=0;i<n;i++){
-        double sum = b[i];
-        for(int k=0;k<i;k++) sum -= L[i][k]*y[k];
-        y[i] = sum; // since L[i][i]=1
-    }
-
-    // Back substitution: Ux=y
-    vector<double> x(n);
-    for(int i=n-1;i>=0;i--){
-        double sum = y[i];
-        for(int k=i+1;k<n;k++) sum -= U[i][k]*x[k];
-        x[i] = sum / U[i][i];
-    }
-
-    cout.setf(std::ios::fixed); cout<<setprecision(6);
-    for(int i=0;i<n;i++) cout << "x["<<i<<"] = " << x[i] << "\n";
     return 0;
 }
+
+
 ```
 
+#### LU Decomposition Input
+```
+4
+3
+2 1 -1 8
+-3 -1 2 -11
+-2 1 2 -3
+2
+1 1 2
+2 2 4
+2
+1 1 2
+2 2 5
+5
+2 1 -1 3 2 9
+1 3 2 -1 1 8
+3 2 4 1 -2 20
+2 1 3 2 1 17
+1 -1 2 3 4 15
+```
+
+#### LU Decomposition Output
+```
+----- Case 1 -----
+
+U Matrix:
+2 1 -1 
+0 0.5 0.5 
+0 0 -1 
+
+L Matrix:
+1 0 0 
+-1.5 1 0 
+-1 4 1 
+
+The system has a UNIQUE SOLUTION.
+
+Final Solution (x values):
+x1 = 2
+x2 = 3
+x3 = -1
+----- Case 2 -----
+
+U Matrix:
+1 1 
+0 0 
+
+L Matrix:
+1 0 
+2 1 
+
+The system has INFINITE SOLUTIONS (Dependent equations).
+----- Case 3 -----
+
+U Matrix:
+1 1 
+0 0 
+
+L Matrix:
+1 0 
+2 1 
+
+The system has NO SOLUTION (Inconsistent equations).
+----- Case 4 -----
+
+U Matrix:
+2 1 -1 3 2 
+0 2.5 2.5 -2.5 0 
+0 0 5 -3 -5 
+0 0 0 1.4 3 
+0 0 0 0 1.85714 
+
+L Matrix:
+1 0 0 0 0 
+0.5 1 0 0 0 
+1.5 0.2 1 0 0 
+1 0 0.8 1 0 
+0.5 -0.6 0.8 1.71429 1 
+
+The system has a UNIQUE SOLUTION.
+
+Final Solution (x values):
+x1 = 5.15385
+x2 = -1
+x3 = 2.26154
+x4 = -0.138462
+x5 = 1.18462
+
+
+```
+#### [Back to Contents](#table-of-contents)
 ---
 
 ### Matrix Inversion
 
-**Goal:** Compute \(A^{-1}\) using Gauss-Jordan on \([A|I]\).  
-**File:** `Linear/matrix_inversion.cpp`
+#### Matrix Inversion Theory
 
+#### Method used
+Cofactor/Adjugate-based inverse with recursive determinant.
+
+#### Objective
+Solve `AX = B` via `X = A⁻¹B` when `det(A) ≠ 0`; classify singular cases when det(A) = 0.
+
+#### Data Requirement
+Square matrix A. If `det(A) = 0`, the system may be inconsistent (no solution) or dependent (infinitely many); classification uses the augmented matrix.
+
+#### Core Idea (Formula)
 ```
+AX = B
+```
+```
+X = A⁻¹ B (if det(A) ≠ 0)
+```
+
+#### Notation
+- `A⁻¹`: inverse of A
+- `adj(A)`: adjugate of A
+- `Cᵀ`: transpose of cofactor matrix C
+
+#### Inversion Approach
+- Compute det(A) using cofactors.
+- If det(A) = 0:
+    - If a row of A is all zeros but the corresponding B entry is nonzero → No solution (inconsistent).
+    - If rows of A are dependent and B is compatible → Infinite solutions (dependent).
+    - Stop.
+- Build cofactor matrix C with:
+```
+Cᵢⱼ = (−1)^(i+j) · det(Mᵢⱼ)
+```
+- Form adjugate and inverse:
+```
+adj(A) = Cᵀ
+A⁻¹ = adj(A) / det(A)
+```
+
+#### Evaluation Process
+Multiply A⁻¹ by B to obtain the solution vector X.
+```
+X = A⁻¹ B
+```
+
+#### Accuracy Considerations
+- Recursive determinant and cofactors are computationally expensive and numerically sensitive.
+- Prefer elimination methods for large systems; this approach is illustrative and aligns with the provided code.
+
+#### Applicability
+- Good for educational purposes and small systems where clarity of the inverse construction is desired.
+
+
+#### Matrix Inversion Code
+```cpp
 #include <bits/stdc++.h>
 using namespace std;
 
-static const double EPS = 1e-12;
-
-int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
-
-    int n; 
-    cin >> n;
-    vector<vector<double>> aug(n, vector<double>(2*n, 0.0));
-
-    // Read A
-    for(int i=0;i<n;i++){
-        for(int j=0;j<n;j++) cin >> aug[i][j];
-    }
-    // Append Identity
-    for(int i=0;i<n;i++) aug[i][n+i] = 1.0;
-
-    for(int col=0; col<n; col++){
-        int pivot = col;
-        for(int row=col; row<n; row++)
-            if (fabs(aug[row][col]) > fabs(aug[pivot][col])) pivot = row;
-
-        if (fabs(aug[pivot][col]) < EPS){
-            cout << "Singular matrix. Inverse does not exist.\n";
-            return 0;
-        }
-        swap(aug[pivot], aug[col]);
-
-        double div = aug[col][col];
-        for(int k=0;k<2*n;k++) aug[col][k] /= div;
-
-        for(int row=0; row<n; row++){
-            if(row==col) continue;
-            double factor = aug[row][col];
-            for(int k=0;k<2*n;k++){
-                aug[row][k] -= factor * aug[col][k];
+// Cofactor
+void getCofactor(const vector<vector<double>>& A,
+                 vector<vector<double>>& temp,
+                 int p, int q, int n)
+{
+    int i = 1, j = 1;
+    for (int row = 1; row <= n; row++) {
+        for (int col = 1; col <= n; col++) {
+            if (row != p && col != q) {
+                temp[i][j++] = A[row][col];
+                if (j == n) {
+                    j = 1;
+                    i++;
+                }
             }
         }
     }
+}
 
-    cout.setf(std::ios::fixed); cout<<setprecision(6);
-    for(int i=0;i<n;i++){
-        for(int j=0;j<n;j++){
-            cout << aug[i][n+j] << (j+1==n?'\n':' ');
+//Recursive Determinant
+double determinant(const vector<vector<double>>& A, int n)
+{
+    if (n == 1)
+        return A[1][1];
+
+    double det = 0;
+    int sign = 1;
+    vector<vector<double>> temp(n, vector<double>(n, 0));
+
+    for (int i = 1; i <= n; i++) {
+        getCofactor(A, temp, 1, i, n);
+        det += sign * A[1][i] * determinant(temp, n - 1);
+        sign = -sign;
+    }
+    return det;
+}
+
+int main()
+{
+    ifstream fin("input.txt");
+    ofstream fout("output.txt");
+
+    if (!fin) {
+        cout << "Error opening input file.\n";
+        return 1;
+    }
+
+    int casing;
+    fin>> casing;
+    int r=1;
+    while(casing--){
+    fout<<endl;
+    fout<<"Case "<<r++<<":\n";
+    int n;
+    fin >> n;
+
+    vector<vector<double>> aug(n+1, vector<double>(n+2, 0));
+    vector<vector<double>> a(n+1, vector<double>(n+1, 0));
+    vector<vector<double>> B(n+1, vector<double>(2, 0));
+    vector<vector<double>> C(n+1, vector<double>(n+1, 0));
+    vector<vector<double>> C1(n+1, vector<double>(n+1, 0));
+    vector<vector<double>> res(n+1, vector<double>(2, 0));
+
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= n + 1; j++)
+            fin >> aug[i][j];
+
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= n; j++)
+            a[i][j] = aug[i][j];
+        B[i][1] = aug[i][n+1];
+    }
+
+    double detA = determinant(a, n);
+
+    if (fabs(detA) < 1e-9) {
+        // Row reduce to check rank by gauss jordan elimination
+        vector<vector<double>> tempAug = aug;
+        const double EPS = 1e-9;
+        
+        for (int i = 1; i <= n; i++) {
+            // Find pivot
+            int maxRow = i;
+            for (int k = i + 1; k <= n; k++) {
+                if (fabs(tempAug[k][i]) > fabs(tempAug[maxRow][i]))
+                    maxRow = k;
+            }
+            swap(tempAug[i], tempAug[maxRow]);
+            
+            if (fabs(tempAug[i][i]) < EPS) continue;
+            
+            // Eliminate below
+            for (int k = i + 1; k <= n; k++) {
+                double factor = tempAug[k][i] / tempAug[i][i];
+                for (int j = i; j <= n + 1; j++) {
+                    tempAug[k][j] -= factor * tempAug[i][j];
+                }
+            }
+        }
+        
+        // Check for inconsistency:  row with all zeros in A but non-zero in b
+        bool noSol = false;
+        for (int i = 1; i <= n; i++) {
+            bool allZero = true;
+            for (int j = 1; j <= n; j++) {
+                if (fabs(tempAug[i][j]) > EPS) {
+                    allZero = false;
+                    break;
+                }
+            }
+            if (allZero && fabs(tempAug[i][n+1]) > EPS) {
+                noSol = true;
+                break;
+            }
+        }
+
+        if (noSol)
+            fout << "Determinant = 0 → No Solution (Inconsistent System)\n";
+        else
+            fout << "Determinant = 0 → Infinite Solutions (Dependent System)\n";
+
+        continue;
+    }
+
+    fout << "Determinant = " << detA << "\n\n";
+
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= n; j++) {
+            vector<vector<double>> temp(n, vector<double>(n, 0));
+            getCofactor(a, temp, i, j, n);
+            C[i][j] = pow(-1, i + j) * determinant(temp, n - 1);
         }
     }
+
+    fout << "Inverse Matrix:\n";
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= n; j++) {
+            C1[i][j] = C[j][i] / detA;
+            fout << C1[i][j] << " ";
+        }
+        fout << "\n";
+    }
+
+    for (int i = 1; i <= n; i++) {
+        for (int t = 1; t <= n; t++)
+            res[i][1] += C1[i][t] * B[t][1];
+    }
+
+    fout << "\nSolution Vector:\n";
+    for (int i = 1; i <= n; i++)
+        fout << "x" << i << " = " << res[i][1] << "\n";
+    fout << "\n";
+}
+
+    fin.close();
+    fout.close();
+
+
     return 0;
 }
+
 ```
+
+#### Matrix Inversion Input
+```
+4
+3
+2 1 -1 8
+-3 -1 2 -11
+-2 1 2 -3
+2
+1 1 2
+2 2 4
+2
+1 1 2
+2 2 5
+5
+2 1 -1 3 2 9
+1 3 2 -1 1 8
+3 2 4 1 -2 20
+2 1 3 2 1 17
+1 -1 2 3 4 15
+```
+
+#### Matrix Inversion Output
+```
+
+Case 1:
+Determinant = -1
+
+Inverse Matrix:
+4 3 -1 
+-2 -2 1 
+5 4 -1 
+
+Solution Vector:
+x1 = 2
+x2 = 3
+x3 = -1
+
+
+Case 2:
+Determinant = 0 → Infinite Solutions (Dependent System)
+
+Case 3:
+Determinant = 0 → No Solution (Inconsistent System)
+
+Case 4:
+Determinant = 65
+
+Inverse Matrix:
+0.384615 0.384615 1.92308 -3.76923 1.61538 
+-0 0 -1 2 -1 
+-0.246154 -0.0461538 -0.230769 0.692308 -0.153846 
+-0.0461538 -0.446154 -1.23077 2.69231 -1.15385 
+0.0615385 0.261538 0.307692 -0.923077 0.538462 
+
+Solution Vector:
+x1 = 5.15385
+x2 = -1
+x3 = 2.26154
+x4 = -0.138462
+x5 = 1.18462
+
+
+```
+#### [Back to Contents](#table-of-contents)
+---
 
 ---
 
