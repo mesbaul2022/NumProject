@@ -1,0 +1,5 @@
+Enter the number of data: 5
+Enter the values of x: 1 2 3 4 5
+Enter the values of y: 2 4 5 4 5
+The linear equation is: y = 2.2000 + 0.6000*x
+The value of y at x = 5.0000 is: 5.2000
