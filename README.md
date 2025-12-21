@@ -2445,59 +2445,110 @@ Polynomial coefficients :0 0 1
 
 ```
 #### [Back to Contents](#table-of-contents)
----
-## Runge Kutta
+## Solution of Differential Equations
 
-**Goal:** Solve \(y' = f(x,y)\) using RK4.  
-**File:** `ODE/runge_kutta_rk4.cpp`
+### Runge Kutta Method 
 
-```
-#include <bits/stdc++.h>
+#### Runge Kutta Theory
+#### Method used
+**Runge–Kutta Method (Classical 4th Order RK)**
+
+#### Objective
+To solve initial value problems of the form `dy/dx = f(x, y)` with initial condition `y(x0) = y0`.
+
+#### INITIAL VALUE PROBLEM:
+
+	dy/dx = f(x, y), y(x0) = y0
+
+Goal: Advance solution from `xn` to `x(n+1) = xn + h` with high accuracy.
+
+#### RUNGE-KUTTA 4TH ORDER FORMULA:
+
+Compute slope estimates at different points:
+
+	k1 = f(xn, yn)
+	k2 = f(xn + h/2, yn + h*k1/2)
+	k3 = f(xn + h/2, yn + h*k2/2)
+	k4 = f(xn + h, yn + h*k3)
+
+Update to next step:
+
+	y(n+1) = yn + (h/6)(k1 + 2*k2 + 2*k3 + k4)
+
+#### Data Requirement
+- Initial condition: `(x0, y0)`
+- Differential equation: `dy/dx = f(x, y)`
+- Step size: `h`
+- Final x value: `xn`
+
+#### Features
+- Local truncation error of order `O(h^5)`; global error `O(h^4)`
+- Does not require evaluation of higher derivatives
+- Widely used as a standard one-step method for ODEs.
+
+#### Runge Kutta Code
+```cpp
+#include<bits/stdc++.h>
 using namespace std;
-
-double f(double x, double y){
-    // Example: y' = x + y
-    return x + y;
+double f(double x,double y){
+  return (x-y)/2.0;
 }
-
 int main(){
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr);
+cout<<" x0 and y0 :";
+  double x0,y0;
+  cin>>x0>>y0;
+  double h;
+  cout<<" h:";
+   cin>>h;
+   double xn;
+   cout<<"xn :";
+   cin>>xn;
+   double interval=(xn-x0)/h;
+   double yn;
+   for(double i=1;i<=interval;i++){
+       double k1=h*f(x0,y0);
+       double k2=h*f(x0+(h/2.0),y0+(k1/2.0));
+       double k3=h*f(x0+(h/2.0),y0+(k2/2.0));
+       double k4=h*f(x0+h,y0+k3);
+       double k=(k1+2*k2+2*k3+k4)/6;
+       yn=y0+k;
+      cout  <<"x0= "<< x0<<"  y0= "<< y0<<"  yn="<<yn<<endl;
+       y0=yn;
+       x0+=h;
 
-    double x0, y0, h;
-    int n;
-    cin >> x0 >> y0 >> h >> n;
-
-    double x=x0, y=y0;
-    cout.setf(std::ios::fixed); cout<<setprecision(10);
-    cout << "x y\n";
-    cout << x << " " << y << "\n";
-
-    for(int i=1;i<=n;i++){
-        double k1 = h * f(x, y);
-        double k2 = h * f(x + h/2.0, y + k1/2.0);
-        double k3 = h * f(x + h/2.0, y + k2/2.0);
-        double k4 = h * f(x + h,     y + k3);
-        y += (k1 + 2*k2 + 2*k3 + k4)/6.0;
-        x += h;
-        cout << x << " " << y << "\n";
-    }
-    return 0;
+   }
+   cout<<"y("<<xn<<")= "<<yn<<endl;
+return 0;
 }
+
+
 ```
 
+#### Runge Kutta Input
+```
+0 1
+0.2
+2
+
+```
+
+#### Runge Kutta Output
+```
+x0 and y0 :0 1
+h:0.2
+xn :2
+x0= 0  y0= 1  yn=0.914513
+x0= 0.2  y0= 0.914513  yn=0.856193
+x0= 0.4  y0= 0.856193  yn=0.822455
+x0= 0.6  y0= 0.822455  yn=0.810961
+x0= 0.8  y0= 0.810961  yn=0.819593
+x0= 1  y0= 0.819593  yn=0.846436
+x0= 1.2  y0= 0.846436  yn=0.889757
+x0= 1.4  y0= 0.889757  yn=0.947988
+x0= 1.6  y0= 0.947988  yn=1.01971
+x0= 1.8  y0= 1.01971  yn=1.10364
+y(2)= 1.10364
+
+```
+#### [Back to Contents](#table-of-contents)
 ---
-```
-
-
-
-
-
-
-
-
-
-
-
-
-
